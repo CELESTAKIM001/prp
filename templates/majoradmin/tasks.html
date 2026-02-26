@@ -1,0 +1,139 @@
+{% extends 'majoradmin/base.html' %}
+
+{% block title %}Task Management - Major Admin{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'majoradmin_dashboard' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">Task Management</li>
+{% endblock %}
+
+{% block page_content %}
+<div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <h2 style="color: #333; font-weight: 600;"><i class="fas fa-tasks me-2" style="color: #667eea;"></i>Task Management</h2>
+        <a href="{% url 'majoradmin_create_task' %}" class="btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; padding: 10px 20px; font-weight: 600;">
+            <i class="fas fa-plus me-2"></i>Create Task
+        </a>
+    </div>
+</div>
+
+<!-- Filters Card -->
+<div class="table-card" style="border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+    <div class="card-body" style="padding: 1.5rem;">
+        <form method="GET" class="row g-3">
+            <div class="col-md-4">
+                <select name="status" class="form-select" style="border-radius: 10px; padding: 12px;">
+                    <option value="">All Statuses</option>
+                    <option value="PENDING" {% if request.GET.status == 'PENDING' %}selected{% endif %}>Pending</option>
+                    <option value="IN_PROGRESS" {% if request.GET.status == 'IN_PROGRESS' %}selected{% endif %}>In Progress</option>
+                    <option value="COMPLETED" {% if request.GET.status == 'COMPLETED' %}selected{% endif %}>Completed</option>
+                    <option value="VERIFIED" {% if request.GET.status == 'VERIFIED' %}selected{% endif %}>Verified</option>
+                    <option value="REJECTED" {% if request.GET.status == 'REJECTED' %}selected{% endif %}>Rejected</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select name="assigned_to" class="form-select" style="border-radius: 10px; padding: 12px;">
+                    <option value="">All Users</option>
+                    {% for user in users %}
+                    <option value="{{ user.id }}" {% if request.GET.assigned_to == user.id|stringformat:"s" %}selected{% endif %}>{{ user.username }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn w-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; font-weight: 500;">
+                    <i class="fas fa-filter me-2"></i>Filter
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tasks Table -->
+<div class="table-card" style="border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+    <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 1.5rem;">
+        <h5 class="mb-0" style="font-weight: 600;"><i class="fas fa-list me-2"></i>All Tasks</h5>
+    </div>
+    <div class="card-body" style="padding: 0;">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" style="margin: 0;">
+                <thead style="background: #f8f9fa;">
+                    <tr>
+                        <th style="padding: 15px;">ID</th>
+                        <th style="padding: 15px;">Title</th>
+                        <th style="padding: 15px;">Assigned To</th>
+                        <th style="padding: 15px;">Status</th>
+                        <th style="padding: 15px;">Priority</th>
+                        <th style="padding: 15px;">Due Date</th>
+                        <th style="padding: 15px;">Created</th>
+                        <th style="padding: 15px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in tasks %}
+                    <tr style="transition: all 0.2s;">
+                        <td style="padding: 15px;">{{ task.id }}</td>
+                        <td style="padding: 15px;">
+                            <strong>{{ task.title }}</strong>
+                            <small class="d-block text-muted">{{ task.description|truncatechars:30 }}</small>
+                        </td>
+                        <td style="padding: 15px;">{{ task.assigned_to.username }}</td>
+                        <td style="padding: 15px;">
+                            <span class="badge" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 6px 12px; border-radius: 20px;">
+                                {{ task.get_status_display }}
+                            </span>
+                        </td>
+                        <td style="padding: 15px;">
+                            {% if task.priority == 'HIGH' %}
+                            <span class="badge" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 6px 12px; border-radius: 20px;">HIGH</span>
+                            {% elif task.priority == 'NORMAL' %}
+                            <span class="badge" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; padding: 6px 12px; border-radius: 20px;">NORMAL</span>
+                            {% else %}
+                            <span class="badge" style="background: #6c757d; color: white; padding: 6px 12px; border-radius: 20px;">LOW</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 15px; color: #666;">
+                            {% if task.due_date %}
+                            {{ task.due_date|date:"M d, Y" }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td style="padding: 15px; color: #666;">
+                            {{ task.created_at|date:"M d" }}
+                        </td>
+                        <td style="padding: 15px;">
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'majoradmin_edit_task' task.id %}" class="btn btn-sm" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; border-radius: 8px 0 0 8px;" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                {% if task.status == 'COMPLETED' %}
+                                <a href="{% url 'majoradmin_verify_task' task.id %}" class="btn btn-sm" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;" title="Verify">
+                                    <i class="fas fa-check"></i>
+                                </a>
+                                {% endif %}
+                                <a href="{% url 'majoradmin_delete_task' task.id %}" class="btn btn-sm" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border-radius: 0 8px 8px 0;" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-5">
+                            <i class="fas fa-tasks" style="font-size: 3rem; color: #ddd; margin-bottom: 10px; display: block;"></i>
+                            No tasks found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+.table-hover tbody tr:hover {
+    background: rgba(102, 126, 234, 0.05);
+}
+</style>
+{% endblock %}

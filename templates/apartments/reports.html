@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block title %}Reports - Property Manager{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Reports</h2>
+    </div>
+    
+    <div class="filters">
+        <div class="filter-group">
+            <label>Report Type:</label>
+            <select onchange="location = '?type=' + this.value + '{% if selected_property %}&property={{ selected_property.pk }}{% endif %}'">
+                <option value="income" {% if report_type == 'income' %}selected{% endif %}>Income Report</option>
+                <option value="occupancy" {% if report_type == 'occupancy' %}selected{% endif %}>Occupancy Report</option>
+                <option value="maintenance" {% if report_type == 'maintenance' %}selected{% endif %}>Maintenance Report</option>
+                <option value="financial" {% if report_type == 'financial' %}selected{% endif %}>Financial Report</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Property:</label>
+            <select onchange="location = '?type={{ report_type }}&property=' + this.value">
+                <option value="">All Properties</option>
+                {% for property in properties %}
+                <option value="{{ property.pk }}" {% if selected_property.pk == property.pk %}selected{% endif %}>{{ property.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    
+    {% if report_type == 'income' %}
+    <div class="report-grid">
+        <div class="report-item">
+            <div class="report-item-label">Total Income (This Month)</div>
+            <div class="report-item-value">KSh {{ total_income|floatformat:2 }}</div>
+        </div>
+    </div>
+    
+    <h3 style="margin-bottom: 1rem;">Recent Payments</h3>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Apartment</th>
+                    <th>Tenant</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in payments %}
+                <tr>
+                    <td>{{ payment.lease.apartment }}</td>
+                    <td>{{ payment.lease.tenant.full_name }}</td>
+                    <td>KSh {{ payment.amount|floatformat:2 }}</td>
+                    <td>{{ payment.payment_date }}</td>
+                    <td>{{ payment.get_status_display }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; color: #666;">No payments this month</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+    
+    {% if report_type == 'occupancy' %}
+    <div class="report-grid">
+        <div class="report-item">
+            <div class="report-item-label">Total Apartments</div>
+            <div class="report-item-value">{{ total_apartments }}</div>
+        </div>
+        <div class="report-item">
+            <div class="report-item-label">Occupied</div>
+            <div class="report-item-value">{{ occupied_apartments }}</div>
+        </div>
+        <div class="report-item">
+            <div class="report-item-label">Available</div>
+            <div class="report-item-value">{{ available_apartments }}</div>
+        </div>
+        <div class="report-item">
+            <div class="report-item-label">Occupancy Rate</div>
+            <div class="report-item-value">{{ occupancy_rate|floatformat:1 }}%</div>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if report_type == 'maintenance' %}
+    <div class="report-grid">
+        <div class="report-item">
+            <div class="report-item-label">Total Requests</div>
+            <div class="report-item-value">{{ total_requests }}</div>
+        </div>
+        <div class="report-item">
+            <div class="report-item-label">Pending</div>
+            <div class="report-item-value">{{ pending }}</div>
+        </div>
+        <div class="report-item">
+            <div class="report-item-label">In Progress</div>
+            <div class="report-item-value">{{ in_progress }}</div>
+        </div>
+        <div class="report-item">
+            <div class="report-item-label">Completed</div>
+            <div class="report-item-value">{{ completed }}</div>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if report_type == 'financial' %}
+    <div class="report-grid">
+        <div class="report-item" style="background: #d1fae5;">
+            <div class="report-item-label">Total Income</div>
+            <div class="report-item-value">KSh {{ total_income|floatformat:2 }}</div>
+        </div>
+        <div class="report-item" style="background: #fee2e2;">
+            <div class="report-item-label">Total Expenses</div>
+            <div class="report-item-value">KSh {{ total_expenses|floatformat:2 }}</div>
+        </div>
+        <div class="report-item" style="background: {% if net_income >= 0 %}#d1fae5{% else %}#fee2e2{% endif %};">
+            <div class="report-item-label">Net Income</div>
+            <div class="report-item-value">KSh {{ net_income|floatformat:2 }}</div>
+        </div>
+    </div>
+    
+    <h3 style="margin-bottom: 1rem;">Expenses</h3>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Property</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for expense in expenses %}
+                <tr>
+                    <td>{{ expense.property.name }}</td>
+                    <td>{{ expense.get_category_display }}</td>
+                    <td>{{ expense.description|truncatechars:30 }}</td>
+                    <td>KSh {{ expense.amount|floatformat:2 }}</td>
+                    <td>{{ expense.expense_date }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; color: #666;">No expenses this month</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

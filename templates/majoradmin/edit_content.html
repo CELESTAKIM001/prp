@@ -1,0 +1,90 @@
+{% extends 'majoradmin/base.html' %}
+
+{% block title %}Edit Content - Major Admin{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'majoradmin_dashboard' %}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{% url 'majoradmin_site_content' %}">Site Content</a></li>
+<li class="breadcrumb-item active">Edit</li>
+{% endblock %}
+
+{% block page_content %}
+<div class="row">
+    <div class="col-md-10 mx-auto">
+        <div class="table-card">
+            <div class="card-header">
+                <h5 class="mb-0">Edit Site Content</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Title</label>
+                            <input type="text" name="title" class="form-control" value="{{ content.title }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Content Type</label>
+                            <select name="content_type" class="form-select" required id="content_type">
+                                <option value="TEXT" {% if content.content_type == 'TEXT' %}selected{% endif %}>Text Content</option>
+                                <option value="YOUTUBE" {% if content.content_type == 'YOUTUBE' %}selected{% endif %}>YouTube Video</option>
+                                <option value="ANNOUNCEMENT" {% if content.content_type == 'ANNOUNCEMENT' %}selected{% endif %}>Announcement</option>
+                                <option value="SECTION" {% if content.content_type == 'SECTION' %}selected{% endif %}>Page Section</option>
+                                <option value="BANNER" {% if content.content_type == 'BANNER' %}selected{% endif %}>Banner</option>
+                                <option value="FAQ" {% if content.content_type == 'FAQ' %}selected{% endif %}>FAQ</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3" id="youtube_url_field" style="display:{% if content.content_type == 'YOUTUBE' %}block{% else %}none{% endif %};">
+                        <label class="form-label">YouTube URL</label>
+                        <input type="url" name="youtube_url" class="form-control" value="{{ content.youtube_url|default:'' }}">
+                        <small class="text-muted">Enter YouTube video URL - will be embedded responsively</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Content</label>
+                        <textarea name="content" class="form-control" rows="6" id="content_field">{{ content.content }}</textarea>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Section Key</label>
+                            <input type="text" name="section_key" class="form-control" value="{{ content.section_key|default:'' }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Order</label>
+                            <input type="number" name="order" class="form-control" value="{{ content.order }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="form-check mt-2">
+                                <input type="checkbox" name="is_active" class="form-check-input" id="is_active" {% if content.is_active %}checked{% endif %}>
+                                <label class="form-check-label" for="is_active">Active</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'majoradmin_site_content' %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('content_type').addEventListener('change', function() {
+    var youtubeField = document.getElementById('youtube_url_field');
+    if (this.value === 'YOUTUBE') {
+        youtubeField.style.display = 'block';
+    } else {
+        youtubeField.style.display = 'none';
+    }
+});
+</script>
+{% endblock %}
+

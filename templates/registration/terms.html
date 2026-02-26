@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Terms and Conditions - Property Manager{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px; margin: 2rem auto; padding: 2rem;">
+    <div style="background: white; border-radius: 16px; padding: 2.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+        
+        <h1 style="color: #333; margin-bottom: 1.5rem; font-size: 2rem; text-align: center;">
+            📜 Terms and Conditions
+        </h1>
+        
+        <p style="color: #666; text-align: center; margin-bottom: 2rem;">
+            Last Updated: February 2026
+        </p>
+        
+        <div style="line-height: 1.8; color: #444;">
+            
+            <h2 style="color: #667eea; margin-top: 1.5rem; margin-bottom: 0.75rem;">1. Acceptance of Terms</h2>
+            <p style="margin-bottom: 1rem;">
+                By accessing and using this Property Management System, you accept and agree to be bound by the terms and provision of this agreement.
+            </p>
+            
+            <h2 style="color: #667eea; margin-top: 1.5rem; margin-bottom: 0.75rem;">2. Use License</h2>
+            <p style="margin-bottom: 1rem;">
+                Permission is granted to temporarily use this system for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title.
+            </p>
+            
+            <h2 style="color: #667eea; margin-top: 1.5rem; margin-bottom: 0.75rem;">3. User Account</h2>
+            <p style="margin-bottom: 1rem;">
+                You are responsible for maintaining the confidentiality of your account and password. You agree to accept responsibility for all activities that occur under your account.
+            </p>
+            
+            <h2 style="color: #667eea; margin-top: 1.5rem; margin-bottom: 0.75rem;">4. Privacy Policy</h2>
+            <p style="margin-bottom: 1rem;">
+                Your privacy is important to us. We collect, use, and protect your personal information in accordance with our Privacy Policy.
+            </p>
+            
+            <h2 style="color: #667eea; margin-top: 1.5rem; margin-bottom: 0.75rem;">5. Property Data</h2>
+            <p style="margin-bottom: 1rem;">
+                You are responsible for ensuring the accuracy of property data entered into the system. The system owners are not liable for any inaccuracies in property information.
+            </p>
+            
+            <h2 style="color: #667eea; margin-top: 1.5rem; margin-bottom: 0.75rem;">6. Prohibited Uses</h2>
+            <p style="margin-bottom: 1rem;">You may not use this system:</p>
+            <ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+                <li>For any unlawful purpose</li>
+                <li>To solicit others to perform unlawful acts</li>
+                <li>To violate any international, federal, or local regulations</li>
+                <li>To infringe upon the rights of others</li>
+                <li>To upload viruses or malicious code</li>
+            </ul>
+            
+            <h2 style="color: #667eea; margin-top: 1.5rem; margin-bottom: 0.75rem;">7. Limitation of Liability</h2>
+            <p style="margin-bottom: 1rem;">
+                In no event shall the system owners be liable for any indirect, incidental, special, consequential, or punitive damages.
+            </p>
+            
+            <h2 style="color: #667eea; margin-top: 1.5rem; margin-bottom: 0.75rem;">8. Termination</h2>
+            <p style="margin-bottom: 1rem;">
+                We may terminate your access to the system at any time without notice if you violate these terms.
+            </p>
+            
+            <h2 style="color: #667eea; margin-top: 1.5rem; margin-bottom: 0.75rem;">9. Changes to Terms</h2>
+            <p style="margin-bottom: 1rem;">
+                We reserve the right to modify these terms at any time. Your continued use of the system constitutes acceptance of any changes.
+            </p>
+            
+            <h2 style="color: #667eea; margin-top: 1.5rem; margin-bottom: 0.75rem;">10. Contact Information</h2>
+            <p style="margin-bottom: 2rem;">
+                If you have any questions about these Terms and Conditions, please contact the system administrator.
+            </p>
+            
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 2px solid #eee;">
+            <a href="{% url 'login' %}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; margin-right: 10px;">
+                🔑 Login
+            </a>
+            <a href="{% url 'register' %}" style="display: inline-block; background: #10b981; color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none;">
+                📝 Register
+            </a>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

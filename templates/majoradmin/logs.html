@@ -1,0 +1,115 @@
+{% extends 'majoradmin/base.html' %}
+
+{% block title %}Admin Logs - Major Admin{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'majoradmin_dashboard' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">Admin Logs</li>
+{% endblock %}
+
+{% block page_content %}
+<div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <h2 style="color: #333; font-weight: 600;"><i class="fas fa-history me-2" style="color: #667eea;"></i>Admin Logs</h2>
+        <div class="btn-group">
+            <a href="{% url 'majoradmin_logs' %}" class="btn btn-sm" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px;">All</a>
+        </div>
+    </div>
+</div>
+
+<!-- Filters Card -->
+<div class="table-card" style="border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+    <div class="card-body" style="padding: 1.5rem;">
+        <form method="GET" class="row g-3">
+            <div class="col-md-3">
+                <select name="action" class="form-select" style="border-radius: 10px; padding: 12px;">
+                    <option value="">All Actions</option>
+                    {% for value, label in actions %}
+                    <option value="{{ value }}" {% if request.GET.action == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <div class="input-group">
+                    <span class="input-group-text" style="border-radius: 10px 0 0 10px; background: #f8f9fa; border-color: #e0e0e0;">
+                        <i class="fas fa-user" style="color: #667eea;"></i>
+                    </span>
+                    <input type="text" name="user" class="form-control" placeholder="Search by username" value="{{ request.GET.user|default:'' }}" style="border-radius: 0 10px 10px 0; border-left: none;">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <input type="date" name="date_from" class="form-control" value="{{ request.GET.date_from|default:'' }}" style="border-radius: 10px; padding: 12px;">
+            </div>
+            <div class="col-md-2">
+                <input type="date" name="date_to" class="form-control" value="{{ request.GET.date_to|default:'' }}" style="border-radius: 10px; padding: 12px;">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn w-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; font-weight: 500;">
+                    <i class="fas fa-filter me-2"></i>Filter
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Logs Table -->
+<div class="table-card" style="border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+    <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 1.5rem;">
+        <h5 class="mb-0" style="font-weight: 600;"><i class="fas fa-list me-2"></i>All Logs</h5>
+    </div>
+    <div class="card-body" style="padding: 0;">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" style="margin: 0;">
+                <thead style="background: #f8f9fa;">
+                    <tr>
+                        <th style="padding: 15px;">ID</th>
+                        <th style="padding: 15px;">Action</th>
+                        <th style="padding: 15px;">Admin User</th>
+                        <th style="padding: 15px;">Description</th>
+                        <th style="padding: 15px;">Affected User</th>
+                        <th style="padding: 15px;">IP Address</th>
+                        <th style="padding: 15px;">Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr style="transition: all 0.2s;">
+                        <td style="padding: 15px;">{{ log.id }}</td>
+                        <td style="padding: 15px;">
+                            <span class="badge" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; padding: 6px 12px; border-radius: 20px;">{{ log.action }}</span>
+                        </td>
+                        <td style="padding: 15px;">{{ log.user.username|default:"System" }}</td>
+                        <td style="padding: 15px;">{{ log.description|truncatechars:50 }}</td>
+                        <td style="padding: 15px;">
+                            {% if log.related_user %}
+                            <a href="{% url 'majoradmin_edit_user' log.related_user.id %}" style="color: #667eea; font-weight: 500;">{{ log.related_user.username }}</a>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 15px; color: #666;">{{ log.ip_address|default:"-" }}</td>
+                        <td style="padding: 15px;">
+                            <span style="color: #333;">{{ log.timestamp|date:"M d, Y H:i" }}</span>
+                            <small class="text-muted d-block">{{ log.timestamp|timesince }} ago</small>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-5">
+                            <i class="fas fa-history" style="font-size: 3rem; color: #ddd; margin-bottom: 10px; display: block;"></i>
+                            No logs found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+.table-hover tbody tr:hover {
+    background: rgba(102, 126, 234, 0.05);
+}
+</style>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Tenants - Property Manager{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Tenants</h2>
+        <a href="{% url 'tenant_create' %}" class="btn btn-primary">Add Tenant</a>
+    </div>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>ID Number</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tenant in tenants %}
+                <tr>
+                    <td>{{ tenant.full_name }}</td>
+                    <td>{{ tenant.phone }}</td>
+                    <td>{{ tenant.email|default:"-" }}</td>
+                    <td>{{ tenant.id_number }}</td>
+                    <td>
+                        <a href="{% url 'tenant_detail' tenant.pk %}" class="btn btn-sm btn-primary">View</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; color: #666;">No tenants found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

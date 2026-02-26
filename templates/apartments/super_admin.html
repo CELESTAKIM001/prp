@@ -1,0 +1,259 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Super Admin Dashboard - Property Manager{% endblock %}
+
+{% block extra_css %}
+<style>
+    .super-admin-header {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+    }
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #1a1a2e;
+    }
+    .stat-label {
+        color: #666;
+        font-size: 0.9rem;
+    }
+    .user-table {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    .role-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    .role-admin { background: #e74c3c; color: white; }
+    .role-owner { background: #9b59b6; color: white; }
+    .role-manager { background: #3498db; color: white; }
+    .role-accountant { background: #27ae60; color: white; }
+    .role-maintenance { background: #f39c12; color: white; }
+    .role-security { background: #34495e; color: white; }
+    .role-tenant { background: #1abc9c; color: white; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="super-admin-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1><i class="fas fa-crown"></i> Super Admin Dashboard</h1>
+            <p class="mb-0">System-wide management and monitoring</p>
+        </div>
+        <div>
+            <a href="/admin/" class="btn btn-light me-2"><i class="fas fa-cog"></i> Django Admin</a>
+            <a href="{% url 'dashboard' %}" class="btn btn-outline-light"><i class="fas fa-home"></i> Main Dashboard</a>
+        </div>
+    </div>
+</div>
+
+<!-- System Statistics -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-value">{{ total_users }}</div>
+            <div class="stat-label"><i class="fas fa-users"></i> Total Users</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-value">{{ total_properties }}</div>
+            <div class="stat-label"><i class="fas fa-building"></i> Properties</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-value">{{ total_apartments }}</div>
+            <div class="stat-label"><i class="fas fa-door-open"></i> Apartments</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-value">{{ total_tenants }}</div>
+            <div class="stat-label"><i class="fas fa-user-friends"></i> Tenants</div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-value">${{ monthly_revenue|floatformat:0 }}</div>
+            <div class="stat-label"><i class="fas fa-dollar-sign"></i> Monthly Revenue</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-value">${{ monthly_expenses|floatformat:0 }}</div>
+            <div class="stat-label"><i class="fas fa-receipt"></i> Monthly Expenses</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-value">${{ net_income|floatformat:0 }}</div>
+            <div class="stat-label"><i class="fas fa-chart-line"></i> Net Income</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-value">{{ total_maintenance }}</div>
+            <div class="stat-label"><i class="fas fa-tools"></i> Maintenance Requests</div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- All Users -->
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-users"></i> All Users</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Username</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Joined</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in all_users %}
+                            <tr>
+                                <td><strong>{{ user.username }}</strong></td>
+                                <td>{{ user.first_name }} {{ user.last_name }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>
+                                    {% if user.profile.role %}
+                                    <span class="role-badge role-{{ user.profile.role }}">{{ user.profile.get_role_display }}</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">No Role</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ user.date_joined|date:"M d, Y" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-bolt"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="/admin/auth/user/add/" class="btn btn-outline-primary"><i class="fas fa-user-plus"></i> Add New User</a>
+                    <a href="/admin/apartments/property/add/" class="btn btn-outline-success"><i class="fas fa-building"></i> Add Property</a>
+                    <a href="/admin/apartments/apartment/add/" class="btn btn-outline-info"><i class="fas fa-door-open"></i> Add Apartment</a>
+                    <a href="/admin/apartments/tenant/add/" class="btn btn-outline-warning"><i class="fas fa-user-friends"></i> Add Tenant</a>
+                    <a href="{% url 'reports' %}" class="btn btn-outline-dark"><i class="fas fa-chart-bar"></i> View Reports</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Info -->
+        <div class="card mt-3">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> System Info</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-1"><strong>Total Payments:</strong> {{ total_payments }}</p>
+                <p class="mb-1"><strong>Total Expenses:</strong> {{ total_expenses }}</p>
+                <p class="mb-0"><strong>Django Admin:</strong> <a href="/admin/">/admin/</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h6 class="mb-0"><i class="fas fa-money-bill-wave"></i> Recent Payments</h6>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    {% for payment in recent_payments %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>${{ payment.amount }}</span>
+                        <small class="text-muted">{{ payment.payment_date|date:"M d" }}</small>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item text-center text-muted">No recent payments</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-header bg-warning text-white">
+                <h6 class="mb-0"><i class="fas fa-tools"></i> Recent Maintenance</h6>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    {% for maint in recent_maintenance %}
+                    <li class="list-group-item">
+                        <small>{{ maint.title|truncatechars:30 }}</small>
+                        <br><span class="badge bg-{{ maint.get_status_color }}">{{ maint.get_status_display }}</span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item text-center text-muted">No maintenance requests</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h6 class="mb-0"><i class="fas fa-user-friends"></i> Recent Tenants</h6>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    {% for tenant in recent_tenants %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>{{ tenant.first_name }} {{ tenant.last_name }}</span>
+                        <small class="text-muted">{{ tenant.created_at|date:"M d" }}</small>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item text-center text-muted">No tenants yet</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

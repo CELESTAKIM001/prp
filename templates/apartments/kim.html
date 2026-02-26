@@ -1,0 +1,1284 @@
+
+<!DOCTYPE html>
+
+<html lang="en-us" dir="ltr">
+<head>
+<title>Elsy Gakii - Tenant | Change user profile | Django site admin</title>
+<link rel="stylesheet" href="/static/admin/css/base.css">
+
+  <link rel="stylesheet" href="/static/admin/css/dark_mode.css">
+  <script src="/static/admin/js/theme.js" defer></script>
+
+
+  <link rel="stylesheet" href="/static/admin/css/nav_sidebar.css">
+  <script src="/static/admin/js/nav_sidebar.js" defer></script>
+
+<link rel="stylesheet" href="/static/admin/css/forms.css">
+
+
+<script src="/admin/jsi18n/"></script>
+<script src="/static/admin/js/vendor/jquery/jquery.js"></script>
+<script src="/static/admin/js/calendar.js"></script>
+<script src="/static/admin/js/jquery.init.js"></script>
+<script src="/static/admin/js/admin/DateTimeShortcuts.js"></script>
+<script src="/static/admin/js/core.js"></script>
+<script src="/static/admin/js/admin/RelatedObjectLookups.js"></script>
+<script src="/static/admin/js/actions.js"></script>
+<script src="/static/admin/js/urlify.js"></script>
+<script src="/static/admin/js/prepopulate.js"></script>
+<script src="/static/admin/js/vendor/xregexp/xregexp.js"></script>
+
+
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="/static/admin/css/responsive.css">
+    
+
+<meta name="robots" content="NONE,NOARCHIVE">
+</head>
+
+<body class=" app-apartments model-userprofile change-form"
+  data-admin-utc-offset="10800">
+<a href="#content-start" class="skip-to-content-link">Skip to main content</a>
+<!-- Container -->
+<div id="container">
+
+    
+    <!-- Header -->
+    
+    <div id="header">
+        <div id="branding">
+        
+<h1 id="site-name"><a href="/admin/">Django administration</a></h1>
+
+
+        </div>
+        
+        
+        <div id="user-tools">
+            
+                Welcome,
+                <strong>admin</strong>.
+            
+            
+                
+                    <a href="/">View site</a> /
+                
+                
+                    
+                    
+                
+                
+                <a href="/admin/password_change/">Change password</a> /
+                
+                <form id="logout-form" method="post" action="/admin/logout/">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="85nVeV49LhAm89GZgL9rJkayqHfQOv9EdEXOw3hcn5y42aThKPSaj5DgxewlCvak">
+                    <button type="submit">Log out</button>
+                </form>
+                
+<button class="theme-toggle">
+  <div class="visually-hidden theme-label-when-auto">Toggle theme (current theme: auto)</div>
+  <div class="visually-hidden theme-label-when-light">Toggle theme (current theme: light)</div>
+  <div class="visually-hidden theme-label-when-dark">Toggle theme (current theme: dark)</div>
+  <svg aria-hidden="true" class="theme-icon-when-auto">
+    <use xlink:href="#icon-auto" />
+  </svg>
+  <svg aria-hidden="true" class="theme-icon-when-dark">
+    <use xlink:href="#icon-moon" />
+  </svg>
+  <svg aria-hidden="true" class="theme-icon-when-light">
+    <use xlink:href="#icon-sun" />
+  </svg>
+</button>
+
+            
+        </div>
+        
+        
+        
+    </div>
+    
+    <!-- END Header -->
+    
+      <nav aria-label="Breadcrumbs">
+        
+<div class="breadcrumbs">
+<a href="/admin/">Home</a>
+&rsaquo; <a href="/admin/apartments/">Property Management</a>
+&rsaquo; <a href="/admin/apartments/userprofile/">User profiles</a>
+&rsaquo; Elsy Gakii - Tenant
+</div>
+
+      </nav>
+    
+    
+
+    <div class="main" id="main">
+      
+        
+          
+<button class="sticky toggle-nav-sidebar" id="toggle-nav-sidebar" aria-label="Toggle navigation"></button>
+<nav class="sticky" id="nav-sidebar" aria-label="Sidebar">
+  <input type="search" id="nav-filter"
+         placeholder="Start typing to filter…"
+         aria-label="Filter navigation items">
+  
+
+
+  
+    <div class="app-auth module">
+      <table>
+        <caption>
+          <a href="/admin/auth/" class="section" title="Models in the Authentication and Authorization application">Authentication and Authorization</a>
+        </caption>
+        
+          <tr class="model-group">
+            
+              <th scope="row"><a href="/admin/auth/group/">Groups</a></th>
+            
+
+            
+              <td><a href="/admin/auth/group/add/" class="addlink">Add</a></td>
+            
+
+            
+          </tr>
+        
+          <tr class="model-user">
+            
+              <th scope="row"><a href="/admin/auth/user/">Users</a></th>
+            
+
+            
+              <td><a href="/admin/auth/user/add/" class="addlink">Add</a></td>
+            
+
+            
+          </tr>
+        
+      </table>
+    </div>
+  
+    <div class="app-majoradmin module">
+      <table>
+        <caption>
+          <a href="/admin/majoradmin/" class="section" title="Models in the Majoradmin application">Majoradmin</a>
+        </caption>
+        
+          <tr class="model-adminlog">
+            
+              <th scope="row"><a href="/admin/majoradmin/adminlog/">Admin Logs</a></th>
+            
+
+            
+              <td><a href="/admin/majoradmin/adminlog/add/" class="addlink">Add</a></td>
+            
+
+            
+          </tr>
+        
+          <tr class="model-county">
+            
+              <th scope="row"><a href="/admin/majoradmin/county/">Counties</a></th>
+            
+
+            
+              <td><a href="/admin/majoradmin/county/add/" class="addlink">Add</a></td>
+            
+
+            
+          </tr>
+        
+          <tr class="model-databaseclearlog">
+            
+              <th scope="row"><a href="/admin/majoradmin/databaseclearlog/">Database Clear Logs</a></th>
+            
+
+            
+              <td><a href="/admin/majoradmin/databaseclearlog/add/" class="addlink">Add</a></td>
+            
+
+            
+          </tr>
+        
+          <tr class="model-sitecontent">
+            
+              <th scope="row"><a href="/admin/majoradmin/sitecontent/">Site Contents</a></th>
+            
+
+            
+              <td><a href="/admin/majoradmin/sitecontent/add/" class="addlink">Add</a></td>
+            
+
+            
+          </tr>
+        
+          <tr class="model-task">
+            
+              <th scope="row"><a href="/admin/majoradmin/task/">Tasks</a></th>
+            
+
+            
+              <td><a href="/admin/majoradmin/task/add/" class="addlink">Add</a></td>
+            
+
+            
+          </tr>
+        
+          <tr class="model-usersession">
+            
+              <th scope="row"><a href="/admin/majoradmin/usersession/">User sessions</a></th>
+            
+
+            
+              <td><a href="/admin/majoradmin/usersession/add/" class="addlink">Add</a></td>
+            
+
+            
+          </tr>
+        
+      </table>
+    </div>
+  
+    <div class="app-apartments module current-app">
+      <table>
+        <caption>
+          <a href="/admin/apartments/" class="section" title="Models in the Property Management application">Property Management</a>
+        </caption>
+        
+          <tr class="model-apartment">
+            
+              <th scope="row"><a href="/admin/apartments/apartment/">Apartments</a></th>
+            
+
+            
+              <td><a href="/admin/apartments/apartment/add/" class="addlink">Add</a></td>
+            
+
+            
+          </tr>
+        
+          <tr class="model-expense">
+            
+              <th scope="row"><a href="/admin/apartments/expense/">Expenses</a></th>
+            
+
+            
+              <td><a href="/admin/apartments/expense/add/" class="addlink">Add</a></td>
+            
+
+            
+          </tr>
+        
+          <tr class="model-lease">
+            
+              <th scope="row"><a href="/admin/apartments/lease/">Leases</a></th>
+            
+
+            
+              <td><a href="/admin/apartments/lease/add/" class="addlink">Add</a></td>
+            
+
+            
+          </tr>
+        
+          <tr class="model-maintenancerequest">
+            
+              <th scope="row"><a href="/admin/apartments/maintenancerequest/">Maintenance requests</a></th>
+            
+
+            
+              <td><a href="/admin/apartments/maintenancerequest/add/" class="addlink">Add</a></td>
+            
+
+            
+          </tr>
+        
+          <tr class="model-notification">
+            
+              <th scope="row"><a href="/admin/apartments/notification/">Notifications</a></th>
+            
+
+            
+              <td><a href="/admin/apartments/notification/add/" class="addlink">Add</a></td>
+            
+
+            
+          </tr>
+        
+          <tr class="model-payment">
+            
+              <th scope="row"><a href="/admin/apartments/payment/">Payments</a></th>
+            
+
+            
+              <td><a href="/admin/apartments/payment/add/" class="addlink">Add</a></td>
+            
+
+            
+          </tr>
+        
+          <tr class="model-property">
+            
+              <th scope="row"><a href="/admin/apartments/property/">Propertys</a></th>
+            
+
+            
+              <td><a href="/admin/apartments/property/add/" class="addlink">Add</a></td>
+            
+
+            
+          </tr>
+        
+          <tr class="model-report">
+            
+              <th scope="row"><a href="/admin/apartments/report/">Reports</a></th>
+            
+
+            
+              <td><a href="/admin/apartments/report/add/" class="addlink">Add</a></td>
+            
+
+            
+          </tr>
+        
+          <tr class="model-tenant">
+            
+              <th scope="row"><a href="/admin/apartments/tenant/">Tenants</a></th>
+            
+
+            
+              <td><a href="/admin/apartments/tenant/add/" class="addlink">Add</a></td>
+            
+
+            
+          </tr>
+        
+          <tr class="model-userprofile current-model">
+            
+              <th scope="row"><a href="/admin/apartments/userprofile/" aria-current="page">User profiles</a></th>
+            
+
+            
+              <td><a href="/admin/apartments/userprofile/add/" class="addlink">Add</a></td>
+            
+
+            
+          </tr>
+        
+      </table>
+    </div>
+  
+
+
+</nav>
+
+        
+      
+      <div id="content-start" class="content" tabindex="-1">
+        
+          
+        
+        <!-- Content -->
+        <div id="content" class="colM">
+          
+          <h1>Change user profile</h1>
+          <h2>Elsy Gakii - Tenant</h2>
+          <div id="content-main">
+
+
+  <ul class="object-tools">
+    
+      
+
+<li>
+    
+    <a href="/admin/apartments/userprofile/4/history/" class="historylink">History</a>
+</li>
+
+
+
+    
+  </ul>
+
+
+<form enctype="multipart/form-data" method="post" id="userprofile_form" novalidate><input type="hidden" name="csrfmiddlewaretoken" value="85nVeV49LhAm89GZgL9rJkayqHfQOv9EdEXOw3hcn5y42aThKPSaj5DgxewlCvak">
+<div>
+
+
+
+
+
+
+
+  <fieldset class="module aligned ">
+    
+    
+    
+        <div class="form-row field-user">
+            
+            
+                <div>
+                    
+                        <div class="flex-container">
+                            
+                                <label class="required" for="id_user">User:</label>
+                                
+                                    <input type="text" name="user" value="6" required id="id_user" class="vForeignKeyRawIdAdminField">
+<a href="/admin/auth/user/?_to_field=id" class="related-lookup" id="lookup_id_user" title="Lookup"></a>
+<strong><a href="/admin/auth/user/6/change/">Elsy7214</a></strong>
+                                
+                            
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-role">
+            
+            
+                <div>
+                    
+                        <div class="flex-container">
+                            
+                                <label class="required" for="id_role">Role:</label>
+                                
+                                    <select name="role" id="id_role">
+  <option value="admin">System Administrator</option>
+
+  <option value="owner">Property Owner</option>
+
+  <option value="manager">Property Manager</option>
+
+  <option value="accountant">Accountant / Finance Officer</option>
+
+  <option value="maintenance">Maintenance Staff</option>
+
+  <option value="security">Security / Gate Officer</option>
+
+  <option value="tenant" selected>Tenant</option>
+
+</select>
+                                
+                            
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-phone">
+            
+            
+                <div>
+                    
+                        <div class="flex-container">
+                            
+                                <label for="id_phone">Phone:</label>
+                                
+                                    <input type="text" name="phone" value="0796655737" class="vTextField" maxlength="20" id="id_phone">
+                                
+                            
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-national_id">
+            
+            
+                <div>
+                    
+                        <div class="flex-container">
+                            
+                                <label for="id_national_id">National id:</label>
+                                
+                                    <input type="text" name="national_id" value="none" class="vTextField" maxlength="20" id="id_national_id">
+                                
+                            
+                        </div>
+                    
+                        <div class="help" id="id_national_id_helptext">
+                            <div>National ID/Passport</div>
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-profile_photo">
+            
+            
+                <div>
+                    
+                        <div class="flex-container">
+                            
+                                <label for="id_profile_photo">Profile photo:</label>
+                                
+                                    <input type="file" name="profile_photo" accept="image/*" id="id_profile_photo">
+                                
+                            
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-date_of_birth">
+            
+            
+                <div>
+                    
+                        <div class="flex-container">
+                            
+                                <label for="id_date_of_birth">Date of birth:</label>
+                                
+                                    <p class="date">
+  <input type="text" name="date_of_birth" class="vDateField" size="10" id="id_date_of_birth">
+
+
+</p>
+                                
+                            
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-address">
+            
+            
+                <div>
+                    
+                        <div class="flex-container">
+                            
+                                <label for="id_address">Address:</label>
+                                
+                                    <textarea name="address" cols="40" rows="10" class="vLargeTextField" id="id_address">
+</textarea>
+                                
+                            
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-city">
+            
+            
+                <div>
+                    
+                        <div class="flex-container">
+                            
+                                <label for="id_city">City:</label>
+                                
+                                    <input type="text" name="city" class="vTextField" maxlength="100" id="id_city">
+                                
+                            
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-county">
+            
+            
+                <div>
+                    
+                        <div class="flex-container">
+                            
+                                <label for="id_county">County:</label>
+                                
+                                    <input type="text" name="county" class="vTextField" maxlength="100" id="id_county">
+                                
+                            
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-postal_code">
+            
+            
+                <div>
+                    
+                        <div class="flex-container">
+                            
+                                <label for="id_postal_code">Postal code:</label>
+                                
+                                    <input type="text" name="postal_code" class="vTextField" maxlength="20" id="id_postal_code">
+                                
+                            
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-kra_pin">
+            
+            
+                <div>
+                    
+                        <div class="flex-container">
+                            
+                                <label for="id_kra_pin">Kra pin:</label>
+                                
+                                    <input type="text" name="kra_pin" class="vTextField" maxlength="20" id="id_kra_pin">
+                                
+                            
+                        </div>
+                    
+                        <div class="help" id="id_kra_pin_helptext">
+                            <div>KRA PIN (Kenya)</div>
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-years_experience">
+            
+            
+                <div>
+                    
+                        <div class="flex-container">
+                            
+                                <label for="id_years_experience">Years experience:</label>
+                                
+                                    <input type="number" name="years_experience" value="0" class="vIntegerField" id="id_years_experience">
+                                
+                            
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-company_name">
+            
+            
+                <div>
+                    
+                        <div class="flex-container">
+                            
+                                <label for="id_company_name">Company name:</label>
+                                
+                                    <input type="text" name="company_name" class="vTextField" maxlength="200" id="id_company_name">
+                                
+                            
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-license_number">
+            
+            
+                <div>
+                    
+                        <div class="flex-container">
+                            
+                                <label for="id_license_number">License number:</label>
+                                
+                                    <input type="text" name="license_number" class="vTextField" maxlength="100" id="id_license_number">
+                                
+                            
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-skill_type">
+            
+            
+                <div>
+                    
+                        <div class="flex-container">
+                            
+                                <label for="id_skill_type">Skill type:</label>
+                                
+                                    <input type="text" name="skill_type" class="vTextField" maxlength="100" id="id_skill_type">
+                                
+                            
+                        </div>
+                    
+                        <div class="help" id="id_skill_type_helptext">
+                            <div>For maintenance: Plumber, Electrician, etc.</div>
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-bank_name">
+            
+            
+                <div>
+                    
+                        <div class="flex-container">
+                            
+                                <label for="id_bank_name">Bank name:</label>
+                                
+                                    <input type="text" name="bank_name" class="vTextField" maxlength="100" id="id_bank_name">
+                                
+                            
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-account_number">
+            
+            
+                <div>
+                    
+                        <div class="flex-container">
+                            
+                                <label for="id_account_number">Account number:</label>
+                                
+                                    <input type="text" name="account_number" class="vTextField" maxlength="50" id="id_account_number">
+                                
+                            
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-bank_branch">
+            
+            
+                <div>
+                    
+                        <div class="flex-container">
+                            
+                                <label for="id_bank_branch">Bank branch:</label>
+                                
+                                    <input type="text" name="bank_branch" class="vTextField" maxlength="100" id="id_bank_branch">
+                                
+                            
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-mpesa_paybill">
+            
+            
+                <div>
+                    
+                        <div class="flex-container">
+                            
+                                <label for="id_mpesa_paybill">Mpesa paybill:</label>
+                                
+                                    <input type="text" name="mpesa_paybill" class="vTextField" maxlength="50" id="id_mpesa_paybill">
+                                
+                            
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-mpesa_till">
+            
+            
+                <div>
+                    
+                        <div class="flex-container">
+                            
+                                <label for="id_mpesa_till">Mpesa till:</label>
+                                
+                                    <input type="text" name="mpesa_till" class="vTextField" maxlength="50" id="id_mpesa_till">
+                                
+                            
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-can_add_tenants">
+            
+            
+                <div>
+                    
+                        <div class="flex-container checkbox-row">
+                            
+                                <input type="checkbox" name="can_add_tenants" id="id_can_add_tenants"><label class="vCheckboxLabel" for="id_can_add_tenants">Can add tenants</label>
+                            
+                        </div>
+                    
+                        <div class="help" id="id_can_add_tenants_helptext">
+                            <div>Can add new tenants</div>
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-can_approve_payments">
+            
+            
+                <div>
+                    
+                        <div class="flex-container checkbox-row">
+                            
+                                <input type="checkbox" name="can_approve_payments" id="id_can_approve_payments"><label class="vCheckboxLabel" for="id_can_approve_payments">Can approve payments</label>
+                            
+                        </div>
+                    
+                        <div class="help" id="id_can_approve_payments_helptext">
+                            <div>Can approve payments</div>
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-can_view_reports">
+            
+            
+                <div>
+                    
+                        <div class="flex-container checkbox-row">
+                            
+                                <input type="checkbox" name="can_view_reports" id="id_can_view_reports"><label class="vCheckboxLabel" for="id_can_view_reports">Can view reports</label>
+                            
+                        </div>
+                    
+                        <div class="help" id="id_can_view_reports_helptext">
+                            <div>Can view financial reports</div>
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-can_create_lease">
+            
+            
+                <div>
+                    
+                        <div class="flex-container checkbox-row">
+                            
+                                <input type="checkbox" name="can_create_lease" id="id_can_create_lease"><label class="vCheckboxLabel" for="id_can_create_lease">Can create lease</label>
+                            
+                        </div>
+                    
+                        <div class="help" id="id_can_create_lease_helptext">
+                            <div>Can create lease agreements</div>
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-can_create_payment">
+            
+            
+                <div>
+                    
+                        <div class="flex-container checkbox-row">
+                            
+                                <input type="checkbox" name="can_create_payment" id="id_can_create_payment"><label class="vCheckboxLabel" for="id_can_create_payment">Can create payment</label>
+                            
+                        </div>
+                    
+                        <div class="help" id="id_can_create_payment_helptext">
+                            <div>Can record payments</div>
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-can_create_maintenance">
+            
+            
+                <div>
+                    
+                        <div class="flex-container checkbox-row">
+                            
+                                <input type="checkbox" name="can_create_maintenance" id="id_can_create_maintenance"><label class="vCheckboxLabel" for="id_can_create_maintenance">Can create maintenance</label>
+                            
+                        </div>
+                    
+                        <div class="help" id="id_can_create_maintenance_helptext">
+                            <div>Can create maintenance requests</div>
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-can_manage_properties">
+            
+            
+                <div>
+                    
+                        <div class="flex-container checkbox-row">
+                            
+                                <input type="checkbox" name="can_manage_properties" id="id_can_manage_properties"><label class="vCheckboxLabel" for="id_can_manage_properties">Can manage properties</label>
+                            
+                        </div>
+                    
+                        <div class="help" id="id_can_manage_properties_helptext">
+                            <div>Can add/edit properties</div>
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-can_manage_apartments">
+            
+            
+                <div>
+                    
+                        <div class="flex-container checkbox-row">
+                            
+                                <input type="checkbox" name="can_manage_apartments" id="id_can_manage_apartments"><label class="vCheckboxLabel" for="id_can_manage_apartments">Can manage apartments</label>
+                            
+                        </div>
+                    
+                        <div class="help" id="id_can_manage_apartments_helptext">
+                            <div>Can add/edit apartments</div>
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-can_manage_users">
+            
+            
+                <div>
+                    
+                        <div class="flex-container checkbox-row">
+                            
+                                <input type="checkbox" name="can_manage_users" id="id_can_manage_users"><label class="vCheckboxLabel" for="id_can_manage_users">Can manage users</label>
+                            
+                        </div>
+                    
+                        <div class="help" id="id_can_manage_users_helptext">
+                            <div>Can manage user accounts</div>
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-can_view_all_payments">
+            
+            
+                <div>
+                    
+                        <div class="flex-container checkbox-row">
+                            
+                                <input type="checkbox" name="can_view_all_payments" id="id_can_view_all_payments"><label class="vCheckboxLabel" for="id_can_view_all_payments">Can view all payments</label>
+                            
+                        </div>
+                    
+                        <div class="help" id="id_can_view_all_payments_helptext">
+                            <div>Can view all payment records</div>
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-can_view_all_maintenance">
+            
+            
+                <div>
+                    
+                        <div class="flex-container checkbox-row">
+                            
+                                <input type="checkbox" name="can_view_all_maintenance" id="id_can_view_all_maintenance"><label class="vCheckboxLabel" for="id_can_view_all_maintenance">Can view all maintenance</label>
+                            
+                        </div>
+                    
+                        <div class="help" id="id_can_view_all_maintenance_helptext">
+                            <div>Can view all maintenance requests</div>
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-assigned_property">
+            
+            
+                <div>
+                    
+                        <div class="flex-container">
+                            
+                                <label for="id_assigned_property">Assigned property:</label>
+                                
+                                    <input type="text" name="assigned_property" id="id_assigned_property" class="vForeignKeyRawIdAdminField">
+<a href="/admin/apartments/property/?_to_field=id" class="related-lookup" id="lookup_id_assigned_property" title="Lookup"></a>
+                                
+                            
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-availability_status">
+            
+            
+                <div>
+                    
+                        <div class="flex-container">
+                            
+                                <label class="required" for="id_availability_status">Availability status:</label>
+                                
+                                    <select name="availability_status" id="id_availability_status">
+  <option value="available" selected>Available</option>
+
+  <option value="busy">Busy</option>
+
+  <option value="off">Off Duty</option>
+
+</select>
+                                
+                            
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-shift">
+            
+            
+                <div>
+                    
+                        <div class="flex-container">
+                            
+                                <label for="id_shift">Shift:</label>
+                                
+                                    <select name="shift" id="id_shift">
+  <option value="" selected>---------</option>
+
+  <option value="day">Day</option>
+
+  <option value="night">Night</option>
+
+</select>
+                                
+                            
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-supervisor_name">
+            
+            
+                <div>
+                    
+                        <div class="flex-container">
+                            
+                                <label for="id_supervisor_name">Supervisor name:</label>
+                                
+                                    <input type="text" name="supervisor_name" class="vTextField" maxlength="200" id="id_supervisor_name">
+                                
+                            
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-assigned_gate">
+            
+            
+                <div>
+                    
+                        <div class="flex-container">
+                            
+                                <label for="id_assigned_gate">Assigned gate:</label>
+                                
+                                    <input type="text" name="assigned_gate" class="vTextField" maxlength="50" id="id_assigned_gate">
+                                
+                            
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-emergency_contact_name">
+            
+            
+                <div>
+                    
+                        <div class="flex-container">
+                            
+                                <label for="id_emergency_contact_name">Emergency contact name:</label>
+                                
+                                    <input type="text" name="emergency_contact_name" class="vTextField" maxlength="200" id="id_emergency_contact_name">
+                                
+                            
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-emergency_contact_phone">
+            
+            
+                <div>
+                    
+                        <div class="flex-container">
+                            
+                                <label for="id_emergency_contact_phone">Emergency contact phone:</label>
+                                
+                                    <input type="text" name="emergency_contact_phone" class="vTextField" maxlength="20" id="id_emergency_contact_phone">
+                                
+                            
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+        <div class="form-row field-emergency_contact_relation">
+            
+            
+                <div>
+                    
+                        <div class="flex-container">
+                            
+                                <label for="id_emergency_contact_relation">Emergency contact relation:</label>
+                                
+                                    <input type="text" name="emergency_contact_relation" class="vTextField" maxlength="50" id="id_emergency_contact_relation">
+                                
+                            
+                        </div>
+                    
+                </div>
+            
+            
+        </div>
+    
+</fieldset>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="submit-row">
+
+<input type="submit" value="Save" class="default" name="_save">
+
+<input type="submit" value="Save and add another" name="_addanother">
+<input type="submit" value="Save and continue editing" name="_continue">
+
+
+    
+    <a href="/admin/apartments/userprofile/4/delete/" class="deletelink">Delete</a>
+
+
+</div>
+
+
+
+    <script id="django-admin-form-add-constants"
+            src="/static/admin/js/change_form.js"
+            
+            async>
+    </script>
+
+
+
+
+<script id="django-admin-prepopulated-fields-constants"
+        src="/static/admin/js/prepopulate_init.js"
+        data-prepopulated-fields="[]">
+</script>
+
+
+</div>
+</form></div>
+
+          
+          <br class="clear">
+        </div>
+        <!-- END Content -->
+        <div id="footer"></div>
+      </div>
+    </div>
+</div>
+<!-- END Container -->
+
+<!-- SVGs -->
+<svg xmlns="http://www.w3.org/2000/svg" class="base-svgs">
+  <symbol viewBox="0 0 24 24" width="1rem" height="1rem" id="icon-auto"><path d="M0 0h24v24H0z" fill="currentColor"/><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-2V4a8 8 0 1 0 0 16z"/></symbol>
+  <symbol viewBox="0 0 24 24" width="1rem" height="1rem" id="icon-moon"><path d="M0 0h24v24H0z" fill="currentColor"/><path d="M10 7a7 7 0 0 0 12 4.9v.1c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2h.1A6.979 6.979 0 0 0 10 7zm-6 5a8 8 0 0 0 15.062 3.762A9 9 0 0 1 8.238 4.938 7.999 7.999 0 0 0 4 12z"/></symbol>
+  <symbol viewBox="0 0 24 24" width="1rem" height="1rem" id="icon-sun"><path d="M0 0h24v24H0z" fill="currentColor"/><path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM11 1h2v3h-2V1zm0 19h2v3h-2v-3zM3.515 4.929l1.414-1.414L7.05 5.636 5.636 7.05 3.515 4.93zM16.95 18.364l1.414-1.414 2.121 2.121-1.414 1.414-2.121-2.121zm2.121-14.85l1.414 1.415-2.121 2.121-1.414-1.414 2.121-2.121zM5.636 16.95l1.414 1.414-2.121 2.121-1.414-1.414 2.121-2.121zM23 11v2h-3v-2h3zM4 11v2H1v-2h3z"/></symbol>
+</svg>
+<!-- END SVGs -->
+</body>
+</html>

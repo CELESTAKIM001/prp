@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ tenant.full_name }} - Property Manager{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">{{ tenant.full_name }}</h2>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <div>
+            <p><strong>Email:</strong> {{ tenant.email|default:"-" }}</p>
+            <p><strong>Phone:</strong> {{ tenant.phone }}</p>
+            <p><strong>Alternative Phone:</strong> {{ tenant.alternative_phone|default:"-" }}</p>
+            <p><strong>Gender:</strong> {{ tenant.get_gender_display }}</p>
+            <p><strong>ID Number:</strong> {{ tenant.id_number }}</p>
+        </div>
+        <div>
+            <p><strong>Occupation:</strong> {{ tenant.occupation|default:"-" }}</p>
+            <p><strong>Employer:</strong> {{ tenant.employer|default:"-" }}</p>
+            <p><strong>Emergency Contact:</strong> {{ tenant.emergency_contact_name|default:"-" }}</p>
+            <p><strong>Emergency Phone:</strong> {{ tenant.emergency_contact_phone|default:"-" }}</p>
+        </div>
+    </div>
+    
+    <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Lease History</h3>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Apartment</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Rent</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lease in leases %}
+                <tr>
+                    <td>{{ lease.apartment }}</td>
+                    <td>{{ lease.start_date }}</td>
+                    <td>{{ lease.end_date }}</td>
+                    <td>KSh {{ lease.rent_amount|floatformat:2 }}</td>
+                    <td>
+                        <span class="badge {% if lease.status == 'active' %}badge-success{% elif lease.status == 'pending' %}badge-warning{% else %}badge-info{% endif %}">
+                            {{ lease.get_status_display }}
+                        </span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; color: #666;">No lease history</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

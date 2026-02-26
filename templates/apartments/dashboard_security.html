@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+
+{% block title %}Security Dashboard - Property Manager{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <!-- Welcome Banner -->
+    <div class="welcome-banner" style="background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);">
+        <div class="welcome-content">
+            <h1>Security Dashboard</h1>
+            <p>Welcome, {{ user.get_full_name|default:user.username }}! - Gate & Visitor Management</p>
+        </div>
+        <div class="welcome-icon">
+            <i class="fas fa-shield-alt"></i>
+        </div>
+    </div>
+
+    <!-- Security Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">
+                <i class="fas fa-users" style="color: var(--primary);"></i> Total Tenants
+            </div>
+            <div class="stat-value">{{ total_tenants }}</div>
+        </div>
+        
+        <div class="stat-card green">
+            <div class="stat-label">
+                <i class="fas fa-walking" style="color: var(--success);"></i> Visitors Today
+            </div>
+            <div class="stat-value">12</div>
+        </div>
+        
+        <div class="stat-card yellow">
+            <div class="stat-label">
+                <i class="fas fa-parking" style="color: var(--warning);"></i> Vehicles
+            </div>
+            <div class="stat-value">45</div>
+        </div>
+        
+        <div class="stat-card red">
+            <div class="stat-label">
+                <i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i> Incidents
+            </div>
+            <div class="stat-value">0</div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-bolt"></i> Quick Actions</h3>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button class="btn btn-primary">
+                <i class="fas fa-user-plus"></i> Register Visitor
+            </button>
+            <a href="{% url 'tenant_list' %}" class="btn btn-outline">
+                <i class="fas fa-users"></i> View Tenants
+            </a>
+            <a href="{% url 'property_list' %}" class="btn btn-outline">
+                <i class="fas fa-building"></i> Properties
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <!-- Recent Visitors -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-user-clock"></i> Today's Visitors</h3>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Tenant Visiting</th>
+                                <th>Time In</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>John Doe</td>
+                                <td>Unit 101</td>
+                                <td>10:30 AM</td>
+                                <td><span class="badge badge-success">Inside</span></td>
+                            </tr>
+                            <tr>
+                                <td>Jane Smith</td>
+                                <td>Unit 205</td>
+                                <td>11:45 AM</td>
+                                <td><span class="badge badge-secondary">Left</span></td>
+                            </tr>
+                            <tr>
+                                <td>Mike Johnson</td>
+                                <td>Unit 302</td>
+                                <td>12:15 PM</td>
+                                <td><span class="badge badge-success">Inside</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <!-- Entry/Exit Log -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-list"></i> Entry/Exit Log</h3>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Type</th>
+                                <th>Unit</th>
+                                <th>Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>08:00 AM</td>
+                                <td><span class="badge badge-success">Entry</span></td>
+                                <td>Unit 101</td>
+                                <td>Tenant</td>
+                            </tr>
+                            <tr>
+                                <td>08:15 AM</td>
+                                <td><span class="badge badge-warning">Exit</span></td>
+                                <td>Unit 205</td>
+                                <td>Tenant</td>
+                            </tr>
+                            <tr>
+                                <td>09:00 AM</td>
+                                <td><span class="badge badge-success">Entry</span></td>
+                                <td>Reception</td>
+                                <td>Visitor</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.welcome-banner {
+    background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+    border-radius: 20px;
+    padding: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    margin-bottom: 30px;
+}
+
+.welcome-content h1 {
+    font-size: 28px;
+    margin: 0 0 10px;
+}
+
+.welcome-content p {
+    margin: 0;
+    opacity: 0.9;
+}
+
+.welcome-icon {
+    font-size: 60px;
+    opacity: 0.3;
+}
+
+.badge-success {
+    background: #d1fae5;
+    color: #065f46;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.badge-warning {
+    background: #fef3c7;
+    color: #92400e;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.badge-secondary {
+    background: #f3f4f6;
+    color: #6b7280;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+</style>
+{% endblock %}

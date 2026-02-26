@@ -1,0 +1,81 @@
+{% extends 'majoradmin/base.html' %}
+
+{% block title %}Edit Task - Major Admin{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'majoradmin_dashboard' %}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{% url 'majoradmin_tasks' %}">Tasks</a></li>
+<li class="breadcrumb-item active">Edit Task</li>
+{% endblock %}
+
+{% block page_content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="table-card">
+            <div class="card-header">
+                <h5 class="mb-0">Edit Task</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Task Title</label>
+                        <input type="text" name="title" class="form-control" value="{{ task.title }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-control" rows="4" required>{{ task.description }}</textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Assign To</label>
+                        <select name="assigned_to" class="form-select" required>
+                            {% for user in users %}
+                            <option value="{{ user.id }}" {% if user.id == task.assigned_to.id %}selected{% endif %}>{{ user.username }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Priority</label>
+                            <select name="priority" class="form-select">
+                                <option value="LOW" {% if task.priority == 'LOW' %}selected{% endif %}>Low</option>
+                                <option value="NORMAL" {% if task.priority == 'NORMAL' %}selected{% endif %}>Normal</option>
+                                <option value="HIGH" {% if task.priority == 'HIGH' %}selected{% endif %}>High</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Status</label>
+                            <select name="status" class="form-select">
+                                <option value="PENDING" {% if task.status == 'PENDING' %}selected{% endif %}>Pending</option>
+                                <option value="IN_PROGRESS" {% if task.status == 'IN_PROGRESS' %}selected{% endif %}>In Progress</option>
+                                <option value="COMPLETED" {% if task.status == 'COMPLETED' %}selected{% endif %}>Completed</option>
+                                <option value="VERIFIED" {% if task.status == 'VERIFIED' %}selected{% endif %}>Verified</option>
+                                <option value="REJECTED" {% if task.status == 'REJECTED' %}selected{% endif %}>Rejected</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Due Date</label>
+                            <input type="date" name="due_date" class="form-control" value="{{ task.due_date|date:'Y-m-d'|default:'' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Notes</label>
+                        <textarea name="notes" class="form-control" rows="3">{{ task.notes }}</textarea>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'majoradmin_tasks' %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

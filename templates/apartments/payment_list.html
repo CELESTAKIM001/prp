@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Payments - Property Manager{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Payments</h2>
+        <a href="{% url 'payment_create' %}" class="btn btn-primary">Record Payment</a>
+    </div>
+    
+    <div class="filters">
+        <div class="filter-group">
+            <label>Status:</label>
+            <select onchange="location = this.value;">
+                <option value="{% url 'payment_list' %}">All</option>
+                <option value="?status=completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Completed</option>
+                <option value="?status=pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+                <option value="?status=failed" {% if request.GET.status == 'failed' %}selected{% endif %}>Failed</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Apartment</th>
+                    <th>Tenant</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Method</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in payments %}
+                <tr>
+                    <td>{{ payment.lease.apartment }}</td>
+                    <td>{{ payment.lease.tenant.full_name }}</td>
+                    <td>KSh {{ payment.amount|floatformat:2 }}</td>
+                    <td>{{ payment.payment_date }}</td>
+                    <td>{{ payment.get_payment_method_display }}</td>
+                    <td>
+                        <span class="badge {% if payment.status == 'completed' %}badge-success{% elif payment.status == 'pending' %}badge-warning{% else %}badge-danger{% endif %}">
+                            {{ payment.get_status_display }}
+                        </span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; color: #666;">No payments found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

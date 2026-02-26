@@ -1,0 +1,181 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found | Property Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .error-container {
+            text-align: center;
+            padding: 3rem;
+            max-width: 800px;
+            margin: 20px;
+        }
+        
+        .error-code {
+            font-size: 12rem;
+            font-weight: 700;
+            color: white;
+            line-height: 1;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .error-title {
+            font-size: 2.5rem;
+            color: white;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+        
+        .error-message {
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .illustration {
+            width: 300px;
+            height: 300px;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+        
+        .illustration::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.2; }
+        }
+        
+        .illustration i {
+            font-size: 8rem;
+            color: white;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .btn-home {
+            background: white;
+            color: #667eea;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .btn-home:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            color: #667eea;
+        }
+        
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            animation: particle-float 15s infinite;
+        }
+        
+        @keyframes particle-float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
+        
+        .particle:nth-child(1) { left: 10%; width: 20px; height: 20px; animation-delay: 0s; }
+        .particle:nth-child(2) { left: 20%; width: 10px; height: 10px; animation-delay: 2s; }
+        .particle:nth-child(3) { left: 30%; width: 30px; height: 30px; animation-delay: 4s; }
+        .particle:nth-child(4) { left: 40%; width: 15px; height: 15px; animation-delay: 1s; }
+        .particle:nth-child(5) { left: 50%; width: 25px; height: 25px; animation-delay: 3s; }
+        .particle:nth-child(6) { left: 60%; width: 12px; height: 12px; animation-delay: 5s; }
+        .particle:nth-child(7) { left: 70%; width: 18px; height: 18px; animation-delay: 2.5s; }
+        .particle:nth-child(8) { left: 80%; width: 22px; height: 22px; animation-delay: 4.5s; }
+        .particle:nth-child(9) { left: 90%; width: 14px; height: 14px; animation-delay: 1.5s; }
+    </style>
+</head>
+<body>
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+    
+    <div class="error-container">
+        <div class="illustration">
+            <i class="fas fa-ghost"></i>
+        </div>
+        <div class="error-code">404</div>
+        <h1 class="error-title">Page Not Found</h1>
+        <p class="error-message">
+            Oops! The page you're looking for seems to have vanished into the digital void.<br>
+            Don't worry, even the best property managers misplace things sometimes!
+        </p>
+        <a href="/" class="btn-home">
+            <i class="fas fa-home"></i>
+            Back to Home
+        </a>
+    </div>
+</body>
+</html>

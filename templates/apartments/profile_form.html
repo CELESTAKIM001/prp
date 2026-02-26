@@ -1,0 +1,290 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile - Property Manager{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <div class="page-header">
+        <h1><i class="fas fa-user-edit"></i> Edit Profile</h1>
+    </div>
+    
+    <form method="post" class="profile-form">
+        {% csrf_token %}
+        
+        <div class="form-section">
+            <h3>Account Information</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <input type="text" name="first_name" class="form-control" 
+                               value="{{ user.first_name }}">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" name="last_name" class="form-control" 
+                               value="{{ user.last_name }}">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" name="email" class="form-control" 
+                       value="{{ user.email }}">
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3>Personal Details</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="text" name="phone" class="form-control" 
+                               value="{{ profile.phone }}">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>National ID / Passport</label>
+                        <input type="text" name="national_id" class="form-control" 
+                               value="{{ profile.national_id }}">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Address</label>
+                <textarea name="address" class="form-control" rows="2">{{ profile.address }}</textarea>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>City</label>
+                        <input type="text" name="city" class="form-control" 
+                               value="{{ profile.city }}">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>County</label>
+                        <input type="text" name="county" class="form-control" 
+                               value="{{ profile.county }}">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Postal Code</label>
+                <input type="text" name="postal_code" class="form-control" 
+                       value="{{ profile.postal_code }}">
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3>Banking Information</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Bank Name</label>
+                        <input type="text" name="bank_name" class="form-control" 
+                               value="{{ profile.bank_name }}">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Account Number</label>
+                        <input type="text" name="account_number" class="form-control" 
+                               value="{{ profile.account_number }}">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Bank Branch</label>
+                        <input type="text" name="bank_branch" class="form-control" 
+                               value="{{ profile.bank_branch }}">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>M-Pesa Paybill</label>
+                        <input type="text" name="mpesa_paybill" class="form-control" 
+                               value="{{ profile.mpesa_paybill }}">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>M-Pesa Till Number</label>
+                <input type="text" name="mpesa_till" class="form-control" 
+                       value="{{ profile.mpesa_till }}">
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3>Emergency Contact</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Contact Name</label>
+                        <input type="text" name="emergency_contact_name" class="form-control" 
+                               value="{{ profile.emergency_contact_name }}">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Contact Phone</label>
+                        <input type="text" name="emergency_contact_phone" class="form-control" 
+                               value="{{ profile.emergency_contact_phone }}">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Relationship</label>
+                <input type="text" name="emergency_contact_relation" class="form-control" 
+                       value="{{ profile.emergency_contact_relation }}">
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Save Changes
+            </button>
+            <a href="{% url 'profile' %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+<style>
+.profile-form-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.page-header {
+    margin-bottom: 30px;
+}
+
+.page-header h1 {
+    font-size: 28px;
+    color: #1f2937;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.page-header h1 i {
+    color: #667eea;
+}
+
+.profile-form {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.form-section {
+    padding: 30px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.form-section:last-of-type {
+    border-bottom: none;
+}
+
+.form-section h3 {
+    font-size: 18px;
+    color: #1f2937;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #667eea;
+    display: inline-block;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.form-control {
+    padding: 12px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 14px;
+    transition: all 0.3s;
+    width: 100%;
+}
+
+.form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    outline: none;
+}
+
+.form-actions {
+    padding: 24px 30px;
+    background: #f9fafb;
+    display: flex;
+    gap: 12px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+.btn-secondary {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.btn-secondary:hover {
+    background: #d1d5db;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .form-section {
+        padding: 20px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}

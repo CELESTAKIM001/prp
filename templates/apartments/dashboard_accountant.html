@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block title %}Finance Dashboard - Property Manager{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <!-- Welcome Banner -->
+    <div class="welcome-banner" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%);">
+        <div class="welcome-content">
+            <h1>Finance Dashboard</h1>
+            <p>Welcome, {{ user.get_full_name|default:user.username }}! - Financial Overview</p>
+        </div>
+        <div class="welcome-icon">
+            <i class="fas fa-calculator"></i>
+        </div>
+    </div>
+
+    <!-- Financial Stats -->
+    <div class="stats-grid">
+        <div class="stat-card green">
+            <div class="stat-label">
+                <i class="fas fa-arrow-up" style="color: var(--success);"></i> Total Income
+            </div>
+            <div class="stat-value" style="font-size: 1.5rem;">KSh {{ monthly_income|floatformat:0 }}</div>
+        </div>
+        
+        <div class="stat-card red">
+            <div class="stat-label">
+                <i class="fas fa-arrow-down" style="color: var(--danger);"></i> Total Expenses
+            </div>
+            <div class="stat-value" style="font-size: 1.5rem;">KSh {{ monthly_expenses|floatformat:0 }}</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-label">
+                <i class="fas fa-wallet" style="color: var(--primary);"></i> Net Income
+            </div>
+            <div class="stat-value" style="font-size: 1.5rem;">KSh {{ net_income|floatformat:0 }}</div>
+        </div>
+        
+        <div class="stat-card yellow">
+            <div class="stat-label">
+                <i class="fas fa-percentage" style="color: var(--warning);"></i> Collection Rate
+            </div>
+            <div class="stat-value">95%</div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-bolt"></i> Quick Actions</h3>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="{% url 'payment_create' %}" class="btn btn-success">
+                <i class="fas fa-plus"></i> Record Payment
+            </a>
+            <a href="{% url 'expense_create' %}" class="btn btn-primary">
+                <i class="fas fa-minus"></i> Record Expense
+            </a>
+            <a href="{% url 'reports' %}" class="btn btn-outline">
+                <i class="fas fa-file-download"></i> Download Reports
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <!-- Recent Payments -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-money-bill-wave"></i> Recent Payments</h3>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tenant</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for payment in recent_payments %}
+                            <tr>
+                                <td>{{ payment.lease.tenant.first_name|default:"" }} {{ payment.lease.tenant.last_name|default:"" }}</td>
+                                <td>KSh {{ payment.amount }}</td>
+                                <td><span class="badge badge-success">{{ payment.get_status_display }}</span></td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" style="text-align: center;">No recent payments</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <!-- Recent Expenses -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-receipt"></i> Recent Expenses</h3>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Maintenance</td>
+                                <td>KSh 5,000</td>
+                                <td>2026-02-20</td>
+                            </tr>
+                            <tr>
+                                <td>Utilities</td>
+                                <td>KSh 12,000</td>
+                                <td>2026-02-15</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.welcome-banner {
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    border-radius: 20px;
+    padding: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    margin-bottom: 30px;
+}
+
+.welcome-content h1 {
+    font-size: 28px;
+    margin: 0 0 10px;
+}
+
+.welcome-content p {
+    margin: 0;
+    opacity: 0.9;
+}
+
+.welcome-icon {
+    font-size: 60px;
+    opacity: 0.3;
+}
+
+.badge-success {
+    background: #d1fae5;
+    color: #065f46;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+</style>
+{% endblock %}

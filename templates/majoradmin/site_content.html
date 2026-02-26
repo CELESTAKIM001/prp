@@ -1,0 +1,93 @@
+{% extends 'majoradmin/base.html' %}
+
+{% block title %}Site Content - Major Admin{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'majoradmin_dashboard' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">Site Content</li>
+{% endblock %}
+
+{% block page_content %}
+<div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <h2 style="color: #333; font-weight: 600;"><i class="fas fa-file-alt me-2" style="color: #667eea;"></i>Site Content Management</h2>
+        <a href="{% url 'majoradmin_create_content' %}" class="btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; padding: 10px 20px; font-weight: 600;">
+            <i class="fas fa-plus me-2"></i>Add Content
+        </a>
+    </div>
+</div>
+
+<!-- Content Table -->
+<div class="table-card" style="border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+    <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 1.5rem;">
+        <h5 class="mb-0" style="font-weight: 600;"><i class="fas fa-list me-2"></i>All Content</h5>
+    </div>
+    <div class="card-body" style="padding: 0;">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" style="margin: 0;">
+                <thead style="background: #f8f9fa;">
+                    <tr>
+                        <th style="padding: 15px;">ID</th>
+                        <th style="padding: 15px;">Title</th>
+                        <th style="padding: 15px;">Type</th>
+                        <th style="padding: 15px;">Section Key</th>
+                        <th style="padding: 15px;">Status</th>
+                        <th style="padding: 15px;">Order</th>
+                        <th style="padding: 15px;">Created</th>
+                        <th style="padding: 15px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for content in contents %}
+                    <tr style="transition: all 0.2s;">
+                        <td style="padding: 15px;">{{ content.id }}</td>
+                        <td style="padding: 15px;">
+                            <strong>{{ content.title }}</strong>
+                            {% if content.content_type == 'YOUTUBE' and content.youtube_url %}
+                            <small class="d-block text-muted">{{ content.youtube_url }}</small>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 15px;">
+                            <span class="badge" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; padding: 6px 12px; border-radius: 20px;">{{ content.get_content_type_display }}</span>
+                        </td>
+                        <td style="padding: 15px; color: #666;">{{ content.section_key|default:"-" }}</td>
+                        <td style="padding: 15px;">
+                            {% if content.is_active %}
+                            <span class="badge" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 6px 12px; border-radius: 20px;">Active</span>
+                            {% else %}
+                            <span class="badge" style="background: #6c757d; color: white; padding: 6px 12px; border-radius: 20px;">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 15px;">{{ content.order }}</td>
+                        <td style="padding: 15px; color: #666;">{{ content.created_at|date:"M d, Y" }}</td>
+                        <td style="padding: 15px;">
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'majoradmin_edit_content' content.id %}" class="btn btn-sm" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; border-radius: 8px 0 0 8px;" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'majoradmin_delete_content' content.id %}" class="btn btn-sm" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border-radius: 0 8px 8px 0;" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-5">
+                            <i class="fas fa-file-alt" style="font-size: 3rem; color: #ddd; margin-bottom: 10px; display: block;"></i>
+                            No content found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+.table-hover tbody tr:hover {
+    background: rgba(102, 126, 234, 0.05);
+}
+</style>
+{% endblock %}

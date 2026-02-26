@@ -1,0 +1,327 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - Property Manager{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="profile-header">
+        <div class="profile-avatar">
+            {% if profile.profile_photo %}
+            <img src="{{ profile.profile_photo.url }}" alt="Profile Photo">
+            {% else %}
+            <span class="avatar-initials">{{ user.first_name|default:user.username|slice:":1" }}{{ user.last_name|default:"" }}</span>
+            {% endif %}
+            {% if profile.role == 'accountant' %}
+            <span class="money-icon"><i class="fas fa-money-bill-wave"></i></span>
+            {% endif %}
+        </div>
+        <div class="profile-info">
+            <h1>{{ user.get_full_name|default:user.username }}</h1>
+            <span class="badge badge-{{ profile.role }}">{{ profile.get_role_display }}</span>
+            <p class="text-muted">{{ user.email }}</p>
+        </div>
+        <a href="{% url 'profile_edit' %}" class="btn btn-primary">
+            <i class="fas fa-edit"></i> Edit Profile
+        </a>
+    </div>
+    
+    <div class="profile-content">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-id-card"></i> Personal Information</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-item">
+                            <label>Phone Number</label>
+                            <p>{{ profile.phone|default:"Not provided" }}</p>
+                        </div>
+                        <div class="info-item">
+                            <label>National ID</label>
+                            <p>{{ profile.national_id|default:"Not provided" }}</p>
+                        </div>
+                        <div class="info-item">
+                            <label>Date of Birth</label>
+                            <p>{{ profile.date_of_birth|default:"Not provided" }}</p>
+                        </div>
+                        <div class="info-item">
+                            <label>Address</label>
+                            <p>{{ profile.address|default:"Not provided" }}</p>
+                        </div>
+                        <div class="info-item">
+                            <label>City/County</label>
+                            <p>{{ profile.city|default:"" }} {{ profile.county|default:"" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-money-check-alt"></i> Banking Information</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-item">
+                            <label>Bank Name</label>
+                            <p>{{ profile.bank_name|default:"Not provided" }}</p>
+                        </div>
+                        <div class="info-item">
+                            <label>Account Number</label>
+                            <p>{{ profile.account_number|default:"Not provided" }}</p>
+                        </div>
+                        <div class="info-item">
+                            <label>Bank Branch</label>
+                            <p>{{ profile.bank_branch|default:"Not provided" }}</p>
+                        </div>
+                        <div class="info-item">
+                            <label>M-Pesa Paybill</label>
+                            <p>{{ profile.mpesa_paybill|default:"Not provided" }}</p>
+                        </div>
+                        <div class="info-item">
+                            <label>M-Pesa Till</label>
+                            <p>{{ profile.mpesa_till|default:"Not provided" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-phone-alt"></i> Emergency Contact</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-item">
+                            <label>Contact Name</label>
+                            <p>{{ profile.emergency_contact_name|default:"Not provided" }}</p>
+                        </div>
+                        <div class="info-item">
+                            <label>Contact Phone</label>
+                            <p>{{ profile.emergency_contact_phone|default:"Not provided" }}</p>
+                        </div>
+                        <div class="info-item">
+                            <label>Relationship</label>
+                            <p>{{ profile.emergency_contact_relation|default:"Not provided" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {% if profile.role == 'maintenance' or profile.role == 'security' %}
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-briefcase"></i> Work Details</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if profile.role == 'maintenance' %}
+                        <div class="info-item">
+                            <label>Skill Type</label>
+                            <p>{{ profile.skill_type|default:"Not specified" }}</p>
+                        </div>
+                        <div class="info-item">
+                            <label>Years of Experience</label>
+                            <p>{{ profile.years_experience|default:"0" }} years</p>
+                        </div>
+                        {% endif %}
+                        {% if profile.role == 'security' %}
+                        <div class="info-item">
+                            <label>Assigned Gate</label>
+                            <p>{{ profile.assigned_gate|default:"Not assigned" }}</p>
+                        </div>
+                        <div class="info-item">
+                            <label>Shift</label>
+                            <p>{{ profile.get_shift_display|default:"Not assigned" }}</p>
+                        </div>
+                        {% endif %}
+                        <div class="info-item">
+                            <label>Availability Status</label>
+                            <p><span class="badge badge-{{ profile.availability_status }}">{{ profile.get_availability_status_display }}</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.profile-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.profile-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    padding: 40px;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    color: white;
+    margin-bottom: 30px;
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    color: #667eea;
+    overflow: hidden;
+    border: 4px solid white;
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-initials {
+    font-size: 36px;
+    font-weight: bold;
+    color: #667eea;
+    text-transform: uppercase;
+}
+
+.profile-avatar .money-icon {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: #059669;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    border: 3px solid white;
+}
+
+.profile-avatar {
+    position: relative;
+}
+
+.profile-info {
+    flex: 1;
+}
+
+.profile-info h1 {
+    margin: 0 0 10px;
+    font-size: 28px;
+}
+
+.profile-info p {
+    margin: 0;
+    opacity: 0.9;
+}
+
+.badge {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    margin: 10px 0;
+}
+
+.badge-admin { background: #dc2626; color: white; }
+.badge-owner { background: #7c3aed; color: white; }
+.badge-manager { background: #2563eb; color: white; }
+.badge-accountant { background: #059669; color: white; }
+.badge-maintenance { background: #d97706; color: white; }
+.badge-security { background: #0891b2; color: white; }
+.badge-tenant { background: #64748b; color: white; }
+
+.profile-content .card {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.profile-content .card-header {
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 20px 24px;
+}
+
+.profile-content .card-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #1f2937;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.profile-content .card-header h3 i {
+    color: #667eea;
+}
+
+.profile-content .card-body {
+    padding: 24px;
+}
+
+.info-item {
+    margin-bottom: 16px;
+}
+
+.info-item:last-child {
+    margin-bottom: 0;
+}
+
+.info-item label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.info-item p {
+    margin: 0;
+    color: #1f2937;
+    font-size: 15px;
+}
+
+.badge-available { background: #d1fae5; color: #059669; }
+.badge-busy { background: #fee2e2; color: #dc2626; }
+.badge-off { background: #f3f4f6; color: #6b7280; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .profile-header {
+        flex-direction: column;
+        text-align: center;
+        padding: 30px 20px;
+    }
+    
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        font-size: 40px;
+    }
+    
+    .profile-info h1 {
+        font-size: 24px;
+    }
+}
+</style>
+{% endblock %}

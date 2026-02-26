@@ -1,0 +1,955 @@
+{% load static %}
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Property Management System - Manage your properties, apartments, tenants, and more">
+    <meta name="theme-color" content="#667eea">
+    <title>{% block title %}Property Manager - KIMATHI JORAM{% endblock %}</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5568d3;
+            --primary-light: #8b9cf5;
+            --secondary: #764ba2;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --dark-bg: #111827;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --white: #ffffff;
+            --sidebar-width: 260px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --radius-sm: 0.375rem;
+            --radius: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f1f5f9;
+            color: var(--dark);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* Left Sidebar Layout */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--dark-bg) 0%, #1a1a2e 100%);
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
+        .logo-text {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        
+        .logo-text span {
+            color: #fbbf24;
+        }
+        
+        .sidebar-user {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            position: relative;
+        }
+        
+        .money-badge {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            background: #10b981;
+            color: white;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            border: 2px solid var(--dark-bg);
+        }
+        
+        .user-info {
+            color: white;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .user-role {
+            font-size: 0.75rem;
+            color: var(--gray-400);
+        }
+        
+        /* Navigation */
+        .nav-menu {
+            padding: 1rem 0;
+        }
+        
+        .nav-section {
+            padding: 0.5rem 1rem;
+            margin-top: 1rem;
+        }
+        
+        .nav-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--gray-500);
+            margin-bottom: 0.5rem;
+            padding-left: 0.75rem;
+        }
+        
+        .nav-item {
+            margin: 0.25rem 0.75rem;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--gray-400);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            border-radius: var(--radius-lg);
+            transition: all 0.2s;
+        }
+        
+        .nav-link:hover {
+            background: rgba(255,255,255,0.05);
+            color: white;
+        }
+        
+        .nav-link.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        .nav-link .badge {
+            margin-left: auto;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+        
+        /* Auth pages - no sidebar */
+        body.auth-page .app-container {
+            display: block;
+        }
+        
+        body.auth-page .main-content {
+            margin-left: 0;
+            padding: 0;
+        }
+        
+        body.auth-page .top-header {
+            display: none;
+        }
+        
+        /* Top Header */
+        .top-header {
+            background: var(--white);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        
+        .page-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .header-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius);
+            border: none;
+            background: var(--gray-100);
+            color: var(--gray-600);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .header-btn:hover {
+            background: var(--gray-200);
+            color: var(--primary);
+        }
+        
+        .header-btn .dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background: var(--danger);
+            border-radius: 50%;
+        }
+        
+        .header-btn .notification-badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            min-width: 18px;
+            height: 18px;
+            background: #ef4444;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: bold;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0;
+            padding: 2rem;
+        }
+        
+        /* Cards */
+        .card {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+        }
+        
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .stat-card.green { border-left-color: var(--success); }
+        .stat-card.yellow { border-left-color: var(--warning); }
+        .stat-card.red { border-left-color: var(--danger); }
+        
+        .stat-label {
+            color: var(--gray-500);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            border-radius: var(--radius-lg);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        th {
+            background: var(--gray-100);
+            font-weight: 600;
+            color: var(--gray-600);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        tr:hover {
+            background: var(--gray-50);
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--gray-300);
+            color: var(--gray-600);
+        }
+        
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+        }
+        
+        /* Forms */
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius);
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        /* Messages */
+        .messages {
+            margin-bottom: 1.5rem;
+        }
+        
+        .message {
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .message-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid var(--success);
+        }
+        
+        .message-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid var(--danger);
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--white);
+            color: var(--gray-500);
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border-top: 1px solid var(--gray-200);
+            font-size: 0.875rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .mobile-toggle {
+                display: block !important;
+            }
+        }
+        
+        .mobile-toggle {
+            display: none;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade {
+            animation: fadeIn 0.3s ease-out;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}" oncontextmenu="return {% if user.is_staff or user.is_superuser %}true{% else %}false{% endif %};" onselectstart="return {% if user.is_staff or user.is_superuser %}true{% else %}false{% endif %};" oncopy="return {% if user.is_staff or user.is_superuser %}true{% else %}false{% endif %};" style="{% if not user.is_staff and not user.is_superuser %}user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;{% endif %}">
+    <div class="app-container">
+        <!-- Left Sidebar - Only show for authenticated users -->
+        {% if user.is_authenticated %}
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="{% url 'dashboard' %}" class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div class="logo-text">Property<span>Manager</span></div>
+                </a>
+            </div>
+            
+            <div class="sidebar-user">
+                <div class="user-avatar">{% if user.get_initials %}{{ user.get_initials }}{% else %}{{ user.username|slice:"2"|upper }}{% endif %}{% if user.profile.role == 'accountant' %}<i class="fas fa-money-bill-wave money-badge"></i>{% endif %}</div>
+                <div class="user-info">
+                    <div class="user-name">{{ user.get_full_name|default:user.username }}</div>
+                    <div class="user-role">{% if user.profile %}{{ user.profile.get_role_display }}{% else %}User{% endif %}</div>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <!-- Role-based Navigation -->
+                
+                {% if user.profile.role == 'admin' or user.profile.role == 'owner' or user.profile.role == 'manager' %}
+                <div class="nav-section">
+                    <div class="nav-section-title">Management</div>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="{% url 'dashboard' %}" class="nav-link {% if request.path == '/' %}active{% endif %}">
+                        <i class="fas fa-th-large"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="{% url 'gis_dashboard' %}" class="nav-link {% if '/gis' in request.path %}active{% endif %}">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <span>GIS Map</span>
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="{% url 'property_list' %}" class="nav-link {% if '/properties' in request.path %}active{% endif %}">
+                        <i class="fas fa-building"></i>
+                        <span>Properties</span>
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="{% url 'apartment_list' %}" class="nav-link {% if '/apartments' in request.path %}active{% endif %}">
+                        <i class="fas fa-door-open"></i>
+                        <span>Apartments</span>
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="{% url 'tenant_list' %}" class="nav-link {% if '/tenants' in request.path %}active{% endif %}">
+                        <i class="fas fa-users"></i>
+                        <span>Tenants</span>
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="{% url 'lease_list' %}" class="nav-link {% if '/leases' in request.path %}active{% endif %}">
+                        <i class="fas fa-file-contract"></i>
+                        <span>Leases</span>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Finance</div>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="{% url 'payment_list' %}" class="nav-link {% if '/payments' in request.path %}active{% endif %}">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>Payments</span>
+                        {% if pending_payments_count > 0 %}
+                        <span class="badge" style="background: #f59e0b; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; margin-left: auto;">{{ pending_payments_count }}</span>
+                        {% endif %}
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="{% url 'expense_list' %}" class="nav-link {% if '/expenses' in request.path %}active{% endif %}">
+                        <i class="fas fa-receipt"></i>
+                        <span>Expenses</span>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Maintenance</div>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="{% url 'maintenance_list' %}" class="nav-link {% if '/maintenance' in request.path %}active{% endif %}">
+                        <i class="fas fa-tools"></i>
+                        <span>Maintenance</span>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Reports</div>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="{% url 'reports' %}" class="nav-link {% if '/reports' in request.path %}active{% endif %}">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Reports</span>
+                    </a>
+                </div>
+                {% endif %}
+                
+                {% if user.profile.role == 'tenant' %}
+                <div class="nav-section">
+                    <div class="nav-section-title">My Portal</div>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="{% url 'dashboard' %}" class="nav-link {% if request.path == '/' %}active{% endif %}">
+                        <i class="fas fa-th-large"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="{% url 'lease_list' %}" class="nav-link {% if '/leases' in request.path %}active{% endif %}">
+                        <i class="fas fa-file-contract"></i>
+                        <span>My Lease</span>
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="{% url 'payment_list' %}" class="nav-link {% if '/payments' in request.path %}active{% endif %}">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>My Payments</span>
+                        {% if pending_payments_count > 0 %}
+                        <span class="badge" style="background: #f59e0b; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; margin-left: auto;">{{ pending_payments_count }}</span>
+                        {% endif %}
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="{% url 'maintenance_list' %}" class="nav-link {% if '/maintenance' in request.path %}active{% endif %}">
+                        <i class="fas fa-tools"></i>
+                        <span>Request Maintenance</span>
+                    </a>
+                </div>
+                {% endif %}
+                
+                {% if user.profile.role == 'accountant' %}
+                <div class="nav-section">
+                    <div class="nav-section-title">Finance</div>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="{% url 'dashboard' %}" class="nav-link {% if request.path == '/' %}active{% endif %}">
+                        <i class="fas fa-th-large"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="{% url 'payment_list' %}" class="nav-link {% if '/payments' in request.path %}active{% endif %}">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>Payments</span>
+                        {% if my_payments_count > 0 %}
+                        <span class="badge" style="background: #10b981; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; margin-left: auto;">{{ my_payments_count }}</span>
+                        {% endif %}
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="{% url 'expense_list' %}" class="nav-link {% if '/expenses' in request.path %}active{% endif %}">
+                        <i class="fas fa-receipt"></i>
+                        <span>Expenses</span>
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="{% url 'reports' %}" class="nav-link {% if '/reports' in request.path %}active{% endif %}">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Financial Reports</span>
+                    </a>
+                </div>
+                {% endif %}
+                
+                {% if user.profile.role == 'maintenance' %}
+                <div class="nav-section">
+                    <div class="nav-section-title">Maintenance</div>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="{% url 'dashboard' %}" class="nav-link {% if request.path == '/' %}active{% endif %}">
+                        <i class="fas fa-th-large"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="{% url 'maintenance_list' %}" class="nav-link {% if '/maintenance' in request.path %}active{% endif %}">
+                        <i class="fas fa-tools"></i>
+                        <span>My Tasks</span>
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="{% url 'property_list' %}" class="nav-link {% if '/properties' in request.path %}active{% endif %}">
+                        <i class="fas fa-building"></i>
+                        <span>Properties</span>
+                    </a>
+                </div>
+                {% endif %}
+                
+                {% if user.profile.role == 'security' %}
+                <div class="nav-section">
+                    <div class="nav-section-title">Security</div>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="{% url 'dashboard' %}" class="nav-link {% if request.path == '/' %}active{% endif %}">
+                        <i class="fas fa-th-large"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="{% url 'tenant_list' %}" class="nav-link {% if '/tenants' in request.path %}active{% endif %}">
+                        <i class="fas fa-users"></i>
+                        <span>Tenants</span>
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="{% url 'property_list' %}" class="nav-link {% if '/properties' in request.path %}active{% endif %}">
+                        <i class="fas fa-building"></i>
+                        <span>Properties</span>
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="{% url 'apartment_list' %}" class="nav-link {% if '/apartments' in request.path %}active{% endif %}">
+                        <i class="fas fa-door-open"></i>
+                        <span>Units</span>
+                    </a>
+                </div>
+                {% endif %}
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="{% url 'profile' %}" class="nav-link {% if '/profile' in request.path %}active{% endif %}">
+                        <i class="fas fa-user-circle"></i>
+                        <span>My Profile</span>
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="{% url 'notifications_list' %}" class="nav-link {% if '/notifications' in request.path %}active{% endif %}">
+                        <i class="fas fa-bell"></i>
+                        <span>Notifications</span>
+                        {% if unread_notification_count > 0 %}
+                        <span class="badge" style="background: #ef4444; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; margin-left: 5px;">{{ unread_notification_count }}</span>
+                        {% endif %}
+                    </a>
+                </div>
+                
+                {% if user.is_staff %}
+                <div class="nav-item">
+                    <a href="{% url 'admin:index' %}" target="_blank" class="nav-link">
+                        <i class="fas fa-cog"></i>
+                        <span>Admin Panel</span>
+                    </a>
+                </div>
+                {% endif %}
+                
+                <div class="nav-item">
+                    <a href="{% url 'logout' %}" class="nav-link">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+        {% endif %}
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <button class="header-btn mobile-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title">
+                    {% if request.path == '/' %}Dashboard{% elif '/properties' in request.path %}Properties{% elif '/apartments' in request.path %}Apartments{% elif '/tenants' in request.path %}Tenants{% elif '/leases' in request.path %}Leases{% elif '/payments' in request.path %}Payments{% elif '/expenses' in request.path %}Expenses{% elif '/maintenance' in request.path %}Maintenance{% elif '/gis' in request.path %}GIS Map{% elif '/reports' in request.path %}Reports{% else %}Property Manager{% endif %}
+                </h1>
+                <div class="header-actions">
+                    <a href="{% url 'notifications_list' %}" class="header-btn">
+                        <i class="fas fa-bell"></i>
+                        {% if unread_notification_count > 0 %}
+                        <span class="notification-badge">{{ unread_notification_count }}</span>
+                        {% endif %}
+                    </a>
+                    <a href="{% url 'profile' %}" class="header-btn">
+                        <i class="fas fa-user"></i>
+                    </a>
+                    <a href="{% url 'logout' %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </header>
+            
+            <div class="container">
+                {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                            <div class="message message-{{ message.tags }}">
+                                <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                {% block content %}{% endblock %}
+            </div>
+            
+            <footer class="footer">
+                <p>&copy; 2026 Property Manager - KIMATHI JORAM. All rights reserved.</p>
+            </footer>
+        </main>
+    </div>
+    
+    <script>
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('active');
+        }
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

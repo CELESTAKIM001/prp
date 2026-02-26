@@ -1,0 +1,2533 @@
+{% extends 'base.html' %}
+
+{% block title %}GIS Dashboard - Property Manager{% endblock %}
+
+{% block content %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<style>
+    /* Modern Popup Styles */
+    .leaflet-popup-content-wrapper {
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        padding: 0;
+    }
+    .leaflet-popup-content {
+        margin: 0;
+        min-width: 180px;
+    }
+    .leaflet-popup-tip {
+        background: white;
+    }
+    .custom-popup {
+        padding: 0;
+    }
+    .custom-popup .popup-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 12px 15px;
+        border-radius: 12px 12px 0 0;
+        font-weight: 600;
+        font-size: 14px;
+    }
+    .custom-popup .popup-body {
+        padding: 12px 15px;
+        background: white;
+        border-radius: 0 0 12px 12px;
+    }
+    .custom-popup .popup-body .popup-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .custom-popup .popup-body .popup-row:last-child {
+        border-bottom: none;
+    }
+    .custom-popup .popup-body .popup-label {
+        color: #666;
+        font-size: 12px;
+    }
+    .custom-popup .popup-body .popup-value {
+        color: #333;
+        font-weight: 500;
+        font-size: 13px;
+    }
+    
+    /* Modern Marker Styles */
+    .modern-marker {
+        background: white;
+        border-radius: 50%;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        border: 3px solid #667eea;
+    }
+    
+    /* Layer control styles */
+    .leaflet-layer-control {
+        background: white;
+        padding: 12px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+</style>
+<style>
+    /* Modern Professional GIS Dashboard Styles */
+    :root {
+        --gis-primary: #4f46e5;
+        --gis-primary-dark: #4338ca;
+        --gis-primary-light: #818cf8;
+        --gis-secondary: #0ea5e9;
+        --gis-success: #10b981;
+        --gis-warning: #f59e0b;
+        --gis-danger: #ef4444;
+        --gis-dark: #1e293b;
+        --gis-gray-50: #f8fafc;
+        --gis-gray-100: #f1f5f9;
+        --gis-gray-200: #e2e8f0;
+        --gis-gray-300: #cbd5e1;
+        --gis-gray-500: #64748b;
+        --gis-gray-700: #334155;
+        --gis-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        --gis-gradient-2: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+        --gis-shadow: 0 10px 40px -10px rgba(79, 70, 229, 0.3);
+        --gis-shadow-sm: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    /* Map Container - Professional Styling */
+    .map-wrapper {
+        position: relative;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: var(--gis-shadow);
+    }
+    
+    #map {
+        height: 650px;
+        width: 100%;
+        border: none;
+        border-radius: 0;
+    }
+    
+    /* Map Overlay Controls */
+    .map-overlay {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .map-control-btn {
+        width: 44px;
+        height: 44px;
+        background: white;
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        color: var(--gis-dark);
+        transition: all 0.2s;
+    }
+    
+    .map-control-btn:hover {
+        background: var(--gis-primary);
+        color: white;
+        transform: scale(1.05);
+    }
+    
+    /* Map Info Panel */
+    .map-info-panel {
+        position: absolute;
+        bottom: 30px;
+        left: 20px;
+        background: white;
+        padding: 16px 20px;
+        border-radius: 14px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        z-index: 1000;
+        min-width: 200px;
+    }
+    
+    .map-info-title {
+        font-size: 12px;
+        color: var(--gis-gray-500);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+    
+    .map-info-coords {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--gis-dark);
+        font-family: 'Courier New', monospace;
+    }
+    
+    .map-info-address {
+        font-size: 13px;
+        color: var(--gis-gray-500);
+        margin-top: 6px;
+        line-height: 1.4;
+    }
+    
+    /* Map Legend */
+    .map-legend {
+        position: absolute;
+        bottom: 30px;
+        right: 20px;
+        background: white;
+        padding: 14px 18px;
+        border-radius: 14px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        z-index: 1000;
+    }
+    
+    .map-legend-title {
+        font-size: 12px;
+        color: var(--gis-gray-500);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+    
+    .map-legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--gis-gray-700);
+        margin-bottom: 6px;
+    }
+    
+    .map-legend-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .map-legend-color {
+        width: 14px;
+        height: 14px;
+        border-radius: 4px;
+    }
+    
+    /* Custom Leaflet Popup Styling */
+    .leaflet-popup-content-wrapper {
+        border-radius: 14px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        padding: 0;
+    }
+    
+    .leaflet-popup-content {
+        margin: 0;
+        min-width: 220px;
+    }
+    
+    .leaflet-popup-header {
+        background: var(--gis-gradient);
+        color: white;
+        padding: 14px 16px;
+        border-radius: 14px 14px 0 0;
+    }
+    
+    .leaflet-popup-header h4 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 600;
+    }
+    
+    .leaflet-popup-body {
+        padding: 14px 16px;
+    }
+    
+    .leaflet-popup-body p {
+        margin: 0 0 8px;
+        font-size: 13px;
+        color: var(--gis-gray-700);
+    }
+    
+    .leaflet-popup-body p:last-child {
+        margin-bottom: 0;
+    }
+    
+    .leaflet-popup-footer {
+        padding: 10px 16px;
+        background: var(--gis-gray-50);
+        border-radius: 0 0 14px 14px;
+    }
+    
+    .leaflet-popup-btn {
+        display: inline-block;
+        padding: 6px 12px;
+        background: var(--gis-primary);
+        color: white;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        text-decoration: none;
+    }
+    
+    .leaflet-popup-btn:hover {
+        background: var(--gis-primary-dark);
+        color: white;
+    }
+    
+    /* Custom marker styles */
+    .custom-marker {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .marker-origin {
+        width: 36px;
+        height: 36px;
+        background: var(--gis-primary);
+        border-radius: 50% 50% 50% 0;
+        transform: rotate(-45deg);
+        box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .marker-origin i {
+        transform: rotate(45deg);
+        color: white;
+        font-size: 16px;
+    }
+    
+    .marker-destination {
+        width: 36px;
+        height: 36px;
+        background: var(--gis-danger);
+        border-radius: 50% 50% 50% 0;
+        transform: rotate(-45deg);
+        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .marker-destination i {
+        transform: rotate(45deg);
+        color: white;
+        font-size: 16px;
+    }
+    
+    .marker-property {
+        width: 32px;
+        height: 32px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid var(--gis-primary);
+    }
+    
+    .marker-property i {
+        color: var(--gis-primary);
+        font-size: 14px;
+    }
+    
+    /* Zoom controls styling */
+    .leaflet-control-zoom {
+        border: none !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15) !important;
+        border-radius: 12px !important;
+        overflow: hidden;
+    }
+    
+    .leaflet-control-zoom a {
+        background: white !important;
+        color: var(--gis-dark) !important;
+        border: none !important;
+        width: 40px !important;
+        height: 40px !important;
+        line-height: 40px !important;
+        font-size: 18px !important;
+    }
+    
+    .leaflet-control-zoom a:hover {
+        background: var(--gis-gray-100) !important;
+        color: var(--gis-primary) !important;
+    }
+    
+    /* Attribution styling */
+    .leaflet-control-attribution {
+        background: rgba(255,255,255,0.9) !important;
+        padding: 4px 10px !important;
+        border-radius: 20px 0 0 0 !important;
+        font-size: 10px !important;
+    }
+    
+    .gis-container {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 1.5rem;
+    }
+    
+    @media (max-width: 1200px) {
+        .gis-container {
+            grid-template-columns: 1fr;
+        }
+        
+        #map {
+            height: 450px;
+        }
+    }
+    
+    .map-section {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: var(--gis-shadow-sm);
+    }
+    
+    .map-section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--gis-gray-100);
+    }
+    
+    .map-section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--gis-dark);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .map-section-title i {
+        color: var(--gis-primary);
+    }
+    
+    .property-list-section {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: var(--gis-shadow-sm);
+        max-height: 700px;
+        overflow-y: auto;
+    }
+    
+    .property-list-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+    
+    .property-list-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--gis-dark);
+    }
+    
+    .property-count {
+        background: var(--gis-gradient);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .property-item {
+        padding: 1rem;
+        border: 2px solid var(--gis-gray-200);
+        border-radius: 12px;
+        margin-bottom: 0.75rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .property-item:hover {
+        border-color: var(--gis-primary-light);
+        background-color: var(--gis-gray-50);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
+    }
+    
+    .property-item.has-location {
+        border-left: 4px solid var(--gis-success);
+    }
+    
+    .property-item.no-location {
+        border-left: 4px solid var(--gis-warning);
+    }
+    
+    .property-item.selected-origin {
+        border-left: 4px solid var(--gis-primary);
+        background-color: #eef2ff;
+        border-color: var(--gis-primary);
+    }
+    
+    .property-item.selected-destination {
+        border-left: 4px solid var(--gis-danger);
+        background-color: #fef2f2;
+        border-color: var(--gis-danger);
+    }
+    
+    .property-name {
+        font-weight: 600;
+        color: var(--gis-dark);
+        margin-bottom: 0.25rem;
+        font-size: 0.95rem;
+    }
+    
+    .property-address {
+        font-size: 0.8rem;
+        color: var(--gis-gray-500);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    .property-coords {
+        font-size: 0.75rem;
+        color: var(--gis-primary);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .property-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+    
+    .property-btn {
+        flex: 1;
+        padding: 0.375rem 0.5rem;
+        font-size: 0.7rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.25rem;
+    }
+    
+    .property-btn.origin {
+        background: #eef2ff;
+        color: var(--gis-primary);
+    }
+    
+    .property-btn.origin:hover {
+        background: var(--gis-primary);
+        color: white;
+    }
+    
+    .property-btn.destination {
+        background: #fef2f2;
+        color: var(--gis-danger);
+    }
+    
+    .property-btn.destination:hover {
+        background: var(--gis-danger);
+        color: white;
+    }
+    
+    .property-btn.view {
+        background: var(--gis-gray-100);
+        color: var(--gis-gray-700);
+    }
+    
+    .property-btn.view:hover {
+        background: var(--gis-gray-300);
+    }
+    
+    .location-form {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--gis-gray-200);
+    }
+    
+    .location-form-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--gis-dark);
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .location-form input, .location-form select {
+        width: 100%;
+        padding: 0.625rem 0.875rem;
+        margin-bottom: 0.5rem;
+        border: 2px solid var(--gis-gray-200);
+        border-radius: 8px;
+        font-size: 0.875rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    
+    .location-form input:focus, .location-form select:focus {
+        outline: none;
+        border-color: var(--gis-primary);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+    
+    .map-instructions {
+        background: var(--gis-gradient);
+        color: white;
+        padding: 1rem;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+    }
+    
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .stat-box {
+        background: var(--gis-gray-50);
+        padding: 1rem;
+        border-radius: 12px;
+        text-align: center;
+        border: 2px solid transparent;
+        transition: all 0.3s;
+    }
+    
+    .stat-box:hover {
+        border-color: var(--gis-primary-light);
+        transform: translateY(-2px);
+    }
+    
+    .stat-box-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        background: var(--gis-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .stat-box-label {
+        font-size: 0.75rem;
+        color: var(--gis-gray-500);
+        margin-top: 0.25rem;
+        font-weight: 500;
+    }
+    
+    /* Route Panel Styles */
+    .route-panel {
+        background: var(--gis-gradient);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+        color: white;
+        box-shadow: 0 10px 40px -10px rgba(79, 70, 229, 0.4);
+    }
+    
+    .route-panel h3 {
+        margin-bottom: 1rem;
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1.125rem;
+    }
+    
+    .route-result {
+        background: rgba(255,255,255,0.98);
+        padding: 1rem;
+        border-radius: 12px;
+        margin-bottom: 0.75rem;
+        color: var(--gis-dark);
+    }
+    
+    .route-result.main-route {
+        border: 3px solid var(--gis-primary);
+    }
+    
+    .route-result.alternative {
+        background: #fffbeb;
+        border: 2px solid var(--gis-warning);
+    }
+    
+    .route-distance {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--gis-primary);
+    }
+    
+    .route-duration {
+        font-size: 1rem;
+        color: var(--gis-gray-500);
+        margin-top: 0.25rem;
+    }
+    
+    .route-speed {
+        font-size: 0.9rem;
+        color: var(--gis-success);
+        margin-top: 0.25rem;
+        font-weight: 600;
+    }
+    
+    .route-instructions {
+        font-size: 0.85rem;
+        color: var(--gis-gray-700);
+        margin-top: 0.5rem;
+        padding-top: 0.5rem;
+        border-top: 1px solid var(--gis-gray-200);
+    }
+    
+    .btn-calculate {
+        background: white;
+        color: var(--gis-primary);
+        border: none;
+        padding: 0.875rem 1.5rem;
+        border-radius: 10px;
+        cursor: pointer;
+        width: 100%;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-calculate:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    
+    .btn-clear {
+        background: rgba(255,255,255,0.2);
+        color: white;
+        border: 2px solid rgba(255,255,255,0.3);
+        padding: 0.625rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        width: 100%;
+        font-weight: 500;
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+        transition: all 0.3s;
+    }
+    
+    .btn-clear:hover {
+        background: rgba(255,255,255,0.3);
+    }
+    
+    /* Search Box */
+    .search-box {
+        position: relative;
+        margin-bottom: 1rem;
+    }
+    
+    .search-box input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border: 2px solid var(--gis-gray-200);
+        border-radius: 10px;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+    
+    .search-box input:focus {
+        outline: none;
+        border-color: var(--gis-primary);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+    
+    .search-box i {
+        position: absolute;
+        left: 0.875rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gis-gray-400);
+    }
+    
+    /* Tabs */
+    .gis-tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .gis-tab {
+        flex: 1;
+        padding: 0.625rem;
+        border: none;
+        background: var(--gis-gray-100);
+        cursor: pointer;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        transition: all 0.3s;
+        color: var(--gis-gray-500);
+    }
+    
+    .gis-tab.active {
+        background: var(--gis-gradient);
+        color: white;
+    }
+    
+    .gis-tab:hover:not(.active) {
+        background: var(--gis-gray-200);
+    }
+    
+    /* Filter badges */
+    .filter-badges {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+    }
+    
+    .filter-badge {
+        padding: 0.25rem 0.625rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 2px solid transparent;
+    }
+    
+    .filter-badge.all {
+        background: #eef2ff;
+        color: var(--gis-primary);
+    }
+    
+    .filter-badge.all.active {
+        border-color: var(--gis-primary);
+        background: white;
+    }
+    
+    .filter-badge.located {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .filter-badge.located.active {
+        border-color: var(--gis-success);
+        background: white;
+    }
+    
+    .filter-badge.unlocated {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .filter-badge.unlocated.active {
+        border-color: var(--gis-warning);
+        background: white;
+    }
+    
+    /* Loading spinner */
+    .gis-loading {
+        text-align: center;
+        padding: 2rem;
+        color: var(--gis-primary);
+    }
+    
+    .gis-loading i {
+        font-size: 2rem;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    
+    /* Custom scrollbar */
+    .property-list-section::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .property-list-section::-webkit-scrollbar-track {
+        background: var(--gis-gray-100);
+        border-radius: 10px;
+    }
+    
+    .property-list-section::-webkit-scrollbar-thumb {
+        background: var(--gis-gray-300);
+        border-radius: 10px;
+    }
+    
+    .property-list-section::-webkit-scrollbar-thumb:hover {
+        background: var(--gis-primary-light);
+    }
+</style>
+{% endblock %}
+<style>
+    .property-coords {
+        font-size: 0.8rem;
+        color: #667eea;
+    }
+    
+    .location-form {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #eee;
+    }
+    
+    .location-form input, .location-form select {
+        width: 100%;
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+    
+    .map-instructions {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .stats-row {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stat-box {
+        flex: 1;
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        text-align: center;
+    }
+    
+    .stat-box-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #667eea;
+    }
+    
+    .stat-box-label {
+        font-size: 0.8rem;
+        color: #666;
+    }
+    
+    /* Route Panel Styles */
+    .route-panel {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+        color: white;
+    }
+    
+    .route-panel h3 {
+        margin-bottom: 1rem;
+        color: white;
+    }
+    
+    .route-result {
+        background: rgba(255,255,255,0.95);
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 0.75rem;
+        color: #333;
+    }
+    
+    .route-result.main-route {
+        border: 3px solid #667eea;
+    }
+    
+    .route-result.alternative {
+        background: #fef3c7;
+        border: 2px solid #f59e0b;
+    }
+    
+    .route-distance {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #667eea;
+    }
+    
+    .route-duration {
+        font-size: 1.1rem;
+        color: #666;
+        margin-top: 0.25rem;
+    }
+    
+    .route-speed {
+        font-size: 1rem;
+        color: #10b981;
+        margin-top: 0.25rem;
+        font-weight: 600;
+    }
+    
+    .route-instructions {
+        font-size: 0.85rem;
+        color: #555;
+        margin-top: 0.5rem;
+        padding-top: 0.5rem;
+        border-top: 1px solid #ddd;
+    }
+    
+    .btn-calculate {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 100%;
+        font-size: 1rem;
+        margin-top: 0.5rem;
+    }
+    
+    .btn-calculate:hover {
+        background: #5568d3;
+    }
+    
+    .btn-calculate:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+    }
+    
+    .loading {
+        text-align: center;
+        padding: 1rem;
+        color: #666;
+    }
+    
+    .error-message {
+        background: #fee2e2;
+        color: #991b1b;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+    }
+    
+    .selection-labels {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .selection-label {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .selection-label.origin {
+        background: #eef2ff;
+        color: #667eea;
+    }
+    
+    .selection-label.destination {
+        background: #fef2f2;
+        color: #ef4444;
+    }
+    
+    .selection-label.my-location {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    /* Travel Mode Buttons */
+    .travel-modes {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .travel-mode-btn {
+        flex: 1;
+        padding: 0.75rem;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        background: white;
+        cursor: pointer;
+        text-align: center;
+        transition: all 0.3s;
+        font-size: 0.9rem;
+    }
+    
+    .travel-mode-btn:hover {
+        border-color: #667eea;
+    }
+    
+    .travel-mode-btn.active {
+        border-color: #667eea;
+        background: #eef2ff;
+        color: #667eea;
+    }
+    
+    .travel-mode-btn .icon {
+        font-size: 1.5rem;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+    
+    /* Get My Location Button */
+    .btn-my-location {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        width: 100%;
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-weight: 600;
+    }
+    
+    .btn-my-location:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    
+    .btn-my-location:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+    
+    .location-status {
+        font-size: 0.8rem;
+        color: #666;
+        text-align: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* Live Tracking */
+    .btn-live-track {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        width: 100%;
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-weight: 600;
+    }
+    
+    .btn-live-track:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+    
+    .btn-live-track.active {
+        animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+    
+    .live-tracker-info {
+        background: #fef2f2;
+        border: 2px solid #ef4444;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        display: none;
+    }
+    
+    .live-tracker-info.active {
+        display: block;
+    }
+    
+    .tracker-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+    
+    .tracker-stat {
+        text-align: center;
+    }
+    
+    .tracker-stat-value {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #ef4444;
+    }
+    
+    .tracker-stat-label {
+        font-size: 0.7rem;
+        color: #666;
+    }
+    
+    /* Route Visualization */
+    .route-visual {
+        height: 8px;
+        background: #e5e7eb;
+        border-radius: 4px;
+        margin: 1rem 0;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .route-visual-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        border-radius: 4px;
+        transition: width 0.5s ease;
+    }
+    
+    /* Directions panel */
+    .directions-panel {
+        background: white;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-top: 1rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        max-height: 200px;
+        overflow-y: auto;
+    }
+    
+    .direction-step {
+        display: flex;
+        gap: 0.75rem;
+        padding: 0.75rem;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .direction-step:last-child {
+        border-bottom: none;
+    }
+    
+    .direction-icon {
+        font-size: 1.2rem;
+        min-width: 30px;
+    }
+    
+    .direction-text {
+        font-size: 0.9rem;
+        color: #333;
+    }
+    
+    .direction-distance {
+        font-size: 0.8rem;
+        color: #667eea;
+        font-weight: 600;
+    }
+</style>
+
+<h1 style="margin-bottom: 1.5rem;">🗺️ GIS Property Map with Live Tracking</h1>
+
+<div class="stats-row">
+    <div class="stat-box">
+        <div class="stat-box-value">{{ properties.count }}</div>
+        <div class="stat-box-label">Total Properties</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-box-value">{{ property_locations|length }}</div>
+        <div class="stat-box-label">Mapped Locations</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-box-value" id="currentSpeed">0</div>
+        <div class="stat-box-label">Current Speed (km/h)</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-box-value" id="distanceTraveled">0</div>
+        <div class="stat-box-label">Distance (km)</div>
+    </div>
+</div>
+
+<div class="gis-container">
+    <div class="map-section">
+        <div class="map-instructions">
+            <strong>🧭 Navigation Guide:</strong> 
+            Click properties to set route • Use "Get My Location" for GPS • Select travel mode • 
+            Enable "Live Tracking" to follow movement in real-time
+        </div>
+        <div id="map"></div>
+        
+        <!-- Live Tracking Info Panel -->
+        <div class="live-tracker-info" id="liveTrackerInfo">
+            <div class="tracker-stats">
+                <div class="tracker-stat">
+                    <div class="tracker-stat-value" id="liveSpeed">0</div>
+                    <div class="tracker-stat-label">Speed (km/h)</div>
+                </div>
+                <div class="tracker-stat">
+                    <div class="tracker-stat-value" id="liveDistance">0.00</div>
+                    <div class="tracker-stat-label">Distance (km)</div>
+                </div>
+                <div class="tracker-stat">
+                    <div class="tracker-stat-value" id="liveDuration">00:00</div>
+                    <div class="tracker-stat-label">Duration</div>
+                </div>
+                <div class="tracker-stat">
+                    <div class="tracker-stat-value" id="liveProgress">0%</div>
+                    <div class="tracker-stat-label">Route Progress</div>
+                </div>
+            </div>
+            <div class="route-visual">
+                <div class="route-visual-bar" id="routeProgressBar" style="width: 0%"></div>
+            </div>
+        </div>
+        
+        <!-- Directions Panel -->
+        <div class="directions-panel" id="directionsPanel" style="display: none;">
+            <h4 style="margin-bottom: 0.75rem;">🧭 Turn-by-Turn Directions</h4>
+            <div id="directionsList"></div>
+        </div>
+    </div>
+    
+    <div class="property-list-section">
+        <h3 class="card-title">📍 Route Planner</h3>
+        
+        <!-- Get My Location Button -->
+        <button class="btn-my-location" onclick="getMyLocation()" id="myLocationBtn">
+            <span>📍</span> Get My Location
+        </button>
+        <div class="location-status" id="locationStatus"></div>
+        
+        <!-- Live Tracking Button -->
+        <button class="btn-live-track" onclick="toggleLiveTracking()" id="liveTrackBtn">
+            <span>🔴</span> Start Live Tracking
+        </button>
+        
+        <!-- Travel Mode Selector -->
+        <p style="color: #666; font-size: 0.9rem; margin-bottom: 0.5rem; margin-top: 1rem;">🚗 Travel Mode</p>
+        <div class="travel-modes">
+            <div class="travel-mode-btn active" onclick="setTravelMode('driving')" id="mode-driving">
+                <span class="icon">🚗</span>
+                Drive
+            </div>
+            <div class="travel-mode-btn" onclick="setTravelMode('walking')" id="mode-walking">
+                <span class="icon">🚶</span>
+                Walk
+            </div>
+            <div class="travel-mode-btn" onclick="setTravelMode('cycling')" id="mode-cycling">
+                <span class="icon">🚴</span>
+                Cycle
+            </div>
+        </div>
+        
+        <!-- Address Input for Route -->
+        <div style="background: #f8f9fa; padding: 1rem; border-radius: 10px; margin: 1rem 0;">
+            <p style="color: #333; font-size: 0.95rem; margin-bottom: 0.75rem; font-weight: 600;">🛣️ Calculate Distance</p>
+            <div class="input-group">
+                <label style="font-size: 0.85rem; color: #666; margin-bottom: 4px; display: block;">Point A (Start)</label>
+                <input type="text" id="pointAAddress" class="form-control" placeholder="e.g., Nairobi, Kenya" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
+            </div>
+            <div class="input-group">
+                <label style="font-size: 0.85rem; color: #666; margin-bottom: 4px; display: block;">Point B (End)</label>
+                <input type="text" id="pointBAddress" class="form-control" placeholder="e.g., Mombasa, Kenya" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
+            </div>
+            <button class="btn-calculate" onclick="calculateDistanceFromAddresses()" id="distanceBtn" style="margin-top: 0.5rem;">🛣️ Get Distance & Route</button>
+        </div>
+        
+        <div class="selection-labels">
+            <span class="selection-label origin" id="originLabel" style="display: none;">Origin: <span id="originName">-</span></span>
+            <span class="selection-label my-location" id="myLocationLabel" style="display: none;">📍 My Location</span>
+            <span class="selection-label destination" id="destLabel" style="display: none;">Destination: <span id="destName">-</span></span>
+        </div>
+        
+        <p style="color: #666; font-size: 0.9rem; margin-bottom: 0.5rem;">Select Origin</p>
+        <select id="originSelect" class="form-control" onchange="updateOrigin()" style="margin-bottom: 0.75rem;">
+            <option value="">Choose Origin...</option>
+            <option value="my-location">📍 My Current Location</option>
+            {% for prop in properties %}
+                {% if prop.latitude and prop.longitude %}
+                <option value="{{ prop.id }}">{{ prop.name }}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+        
+        <p style="color: #666; font-size: 0.9rem; margin-bottom: 0.5rem;">Select Destination</p>
+        <select id="destinationSelect" class="form-control" onchange="updateDestination()" style="margin-bottom: 0.75rem;">
+            <option value="">Choose Destination...</option>
+            {% for prop in properties %}
+                {% if prop.latitude and prop.longitude %}
+                <option value="{{ prop.id }}">{{ prop.name }}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+        
+        <button class="btn-calculate" onclick="calculateRoute()" id="calculateBtn">🛣️ Calculate Route</button>
+        
+        <div id="routeResults" class="route-panel" style="display: none;">
+            <h3>🛣️ Route Details</h3>
+            <div id="routeContent"></div>
+        </div>
+        
+        <hr style="margin: 1.5rem 0;">
+        
+        <h3 class="card-title">🏢 Properties</h3>
+        <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">Click to select as origin/destination</p>
+        
+        {% for prop in properties %}
+        <div class="property-item {% if prop.latitude and prop.longitude %}has-location{% else %}no-location{% endif %}" 
+             data-id="{{ prop.id }}" data-name="{{ prop.name|escapejs }}"
+             onclick="handlePropertyClick({{ prop.id }}, '{{ prop.name|escapejs }}')">
+            <div class="property-name">{{ prop.name }}</div>
+            <div class="property-address">{{ prop.address }}</div>
+            {% if prop.latitude and prop.longitude %}
+            <div class="property-coords">
+                📍 {{ prop.latitude|floatformat:4 }}, {{ prop.longitude|floatformat:4 }}
+            </div>
+            {% else %}
+            <div class="property-coords" style="color: #f59e0b;">
+                ⚠️ Click to add location
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        
+        <div id="locationForm" class="location-form" style="display: none; margin-top: 1.5rem; border-top: 2px solid #667eea; padding-top: 1.5rem;">
+            <h4 id="selectedPropertyName" style="margin-bottom: 1rem;"></h4>
+            <form method="post" action="" id="updateLocationForm">
+                {% csrf_token %}
+                <input type="hidden" name="property_id" id="propertyIdInput">
+                <div class="form-group">
+                    <label class="form-label">Latitude</label>
+                    <input type="text" name="latitude" id="latInput" class="form-control" placeholder="e.g., -1.2921">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Longitude</label>
+                    <input type="text" name="longitude" id="lngInput" class="form-control" placeholder="e.g., 36.8219">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Save Location</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-curve@1.0.0/dist/leaflet-curve.js"></script>
+<script>
+    // Property data from server
+    var propertiesData = [
+        {% for prop in properties %}
+        {
+            id: {{ prop.id }},
+            name: "{{ prop.name|escapejs }}",
+            address: "{{ prop.address|escapejs }}",
+            lat: {% if prop.latitude %}{{ prop.latitude }}{% else %}null{% endif %},
+            lng: {% if prop.longitude %}{{ prop.longitude }}{% else %}null{% endif %},
+            total_units: {{ prop.total_units }}
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+    
+    // Initialize map centered on Kenya
+    var map = L.map('map').setView([-1.2921, 36.8219], 6);
+    
+    // Helper function to create curved path for L.curve
+    function getCurvePath(coords) {
+        if (!coords || coords.length < 2) return [];
+        
+        // For short routes, just use straight line
+        if (coords.length < 5) {
+            return ['M', coords[0][0], coords[0][1], 'L', coords[coords.length-1][0], coords[coords.length-1][1]];
+        }
+        
+        // Create bezier curve path
+        var path = ['M', coords[0][0], coords[0][1]];
+        
+        for (var i = 1; i < coords.length - 1; i++) {
+            var p0 = coords[Math.max(0, i - 1)];
+            var p1 = coords[i];
+            var p2 = coords[Math.min(coords.length - 1, i + 1)];
+            
+            // Calculate control points for smooth curve
+            var dx = p2[0] - p0[0];
+            var dy = p2[1] - p0[1];
+            
+            // Use quadratic bezier for smoother curves
+            path.push('Q', p1[0], p1[1], p1[0] + dx * 0.1, p1[1] + dy * 0.1);
+        }
+        
+        // End at the last point
+        var last = coords[coords.length - 1];
+        path.push('L', last[0], last[1]);
+        
+        return path;
+    }
+    
+    // Helper function to create modern popup content
+    function createModernPopup(title, data) {
+        var html = '<div class="custom-popup">';
+        html += '<div class="popup-header">' + title + '</div>';
+        html += '<div class="popup-body">';
+        for (var key in data) {
+            html += '<div class="popup-row">';
+            html += '<span class="popup-label">' + key + '</span>';
+            html += '<span class="popup-value">' + data[key] + '</span>';
+            html += '</div>';
+        }
+        html += '</div></div>';
+        return html;
+    }
+    
+    // Define multiple basemap layers
+    var basemaps = {
+        'OpenStreetMap': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap',
+            maxZoom: 19
+        }),
+        'OpenStreetMap DE': L.tileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap DE',
+            maxZoom: 18
+        }),
+        'CartoDB Voyager': L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '© CartoDB',
+            maxZoom: 20
+        }),
+        'CartoDB Dark': L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '© CartoDB Dark',
+            maxZoom: 20
+        }),
+        'Esri World Imagery': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: '© Esri',
+            maxZoom: 18
+        }),
+        'Esri World Topo': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+            attribution: '© Esri Topo',
+            maxZoom: 18
+        })
+    };
+    
+    // Add default basemap
+    basemaps['OpenStreetMap'].addTo(map);
+    
+    // Custom layer control with preview squares at bottom left
+    var layerControl = L.control({ position: 'bottomleft' });
+    
+    layerControl.onAdd = function(map) {
+        var div = L.DomUtil.create('div', 'leaflet-bar leaflet-layer-control');
+        div.style.background = 'white';
+        div.style.padding = '8px';
+        div.style.borderRadius = '12px';
+        div.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+        div.style.maxWidth = '200px';
+        
+        var title = L.DomUtil.create('div', '', div);
+        title.style.fontSize = '12px';
+        title.style.fontWeight = 'bold';
+        title.style.marginBottom = '8px';
+        title.style.color = '#333';
+        title.innerHTML = '🗺️ Maps';
+        
+        Object.keys(basemaps).forEach(function(name) {
+            var btn = L.DomUtil.create('div', '', div);
+            btn.style.padding = '6px 10px';
+            btn.style.cursor = 'pointer';
+            btn.style.borderRadius = '6px';
+            btn.style.marginBottom = '4px';
+            btn.style.fontSize = '12px';
+            btn.style.display = 'flex';
+            btn.style.alignItems = 'center';
+            btn.style.gap = '8px';
+            btn.style.transition = 'background 0.2s';
+            
+            // Preview square
+            var preview = L.DomUtil.create('div', '', btn);
+            preview.style.width = '24px';
+            preview.style.height = '24px';
+            preview.style.borderRadius = '4px';
+            preview.style.border = '2px solid #ddd';
+            
+            // Set preview colors based on map type
+            if (name === 'OpenStreetMap' || name === 'OpenStreetMap DE') {
+                preview.style.background = 'linear-gradient(135deg, #87CEEB 0%, #90EE90 100%)';
+            } else if (name === 'CartoDB Voyager') {
+                preview.style.background = 'linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%)';
+            } else if (name === 'CartoDB Dark') {
+                preview.style.background = 'linear-gradient(135deg, #2c3e50 0%, #1a252f 100%)';
+            } else if (name === 'Esri World Imagery') {
+                preview.style.background = 'linear-gradient(135deg, #228B22 0%, #006400 100%)';
+            } else if (name === 'Esri World Topo') {
+                preview.style.background = 'linear-gradient(135deg, #8B4513 0%, #D2691E 100%)';
+            }
+            
+            var label = L.DomUtil.create('span', '', btn);
+            label.innerHTML = name;
+            
+            btn.onmouseover = function() { btn.style.background = '#f0f0f0'; };
+            btn.onmouseout = function() { btn.style.background = 'transparent'; };
+            
+            btn.onclick = function() {
+                // Remove all basemaps
+                Object.values(basemaps).forEach(function(bm) {
+                    map.removeLayer(bm);
+                });
+                // Add selected basemap
+                basemaps[name].addTo(map);
+                
+                // Update visual feedback
+                Object.keys(basemaps).forEach(function(n) {
+                    // Reset all buttons
+                });
+            };
+        });
+        
+        return div;
+    };
+    
+    layerControl.addTo(map);
+    
+    var markers = {};
+    var currentPropertyId = null;
+    var currentMarker = null;
+    var routeLayer = null;
+    var alternativeRouteLayer = null;
+    var myLocationMarker = null;
+    var liveMarker = null;
+    
+    // Selection state
+    var originId = null;
+    var destId = null;
+    var originMarker = null;
+    var destMarker = null;
+    var travelMode = 'driving';
+    var myLocation = null;
+    
+    // Route data
+    var currentRoute = null;
+    var currentRouteCoords = [];
+    var liveTrackingActive = false;
+    var watchPositionId = null;
+    var startPosition = null;
+    var distanceTraveled = 0;
+    var startTime = null;
+    var routeDistance = 0;
+    
+    // Add existing markers
+    propertiesData.forEach(function(prop) {
+        if (prop.lat && prop.lng) {
+            var marker = L.marker([prop.lat, prop.lng]).addTo(map);
+            marker.bindPopup(createModernPopup('🏢 ' + prop.name, {
+                '📍 Address': prop.address || 'N/A',
+                '🏠 Units': prop.total_units || '0',
+                '🗺️ Lat/Lng': prop.lat.toFixed(4) + ', ' + prop.lng.toFixed(4)
+            }));
+            markers[prop.id] = marker;
+        }
+    });
+    
+    // Click on map to set location
+    map.on('click', function(e) {
+        if (currentPropertyId) {
+            var lat = e.latlng.lat.toFixed(6);
+            var lng = e.latlng.lng.toFixed(6);
+            
+            document.getElementById('latInput').value = lat;
+            document.getElementById('lngInput').value = lng;
+            
+            if (currentMarker) {
+                map.removeLayer(currentMarker);
+            }
+            currentMarker = L.marker([lat, lng], {draggable: true}).addTo(map);
+            currentMarker.bindPopup('Selected location').openPopup();
+            
+            currentMarker.on('dragend', function(event) {
+                var position = currentMarker.getLatLng();
+                document.getElementById('latInput').value = position.lat.toFixed(6);
+                document.getElementById('lngInput').value = position.lng.toFixed(6);
+            });
+        }
+    });
+    
+    // Get user's current location
+    function getMyLocation() {
+        var btn = document.getElementById('myLocationBtn');
+        var status = document.getElementById('locationStatus');
+        
+        if (!navigator.geolocation) {
+            status.textContent = 'Geolocation is not supported by your browser';
+            return;
+        }
+        
+        btn.disabled = true;
+        btn.innerHTML = '<span>⏳</span> Finding you...';
+        status.textContent = 'Requesting location access...';
+        
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                myLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+                
+                if (myLocationMarker) {
+                    map.removeLayer(myLocationMarker);
+                }
+                
+                myLocationMarker = L.marker([myLocation.lat, myLocation.lng], {
+                    icon: createIcon('#10b981')
+                }).addTo(map);
+                myLocationMarker.bindPopup('📍 Your Location').openPopup();
+                
+                map.setView([myLocation.lat, myLocation.lng], 14);
+                
+                status.textContent = '✓ Location found!';
+                btn.innerHTML = '<span>📍</span> Location Found';
+                
+                var originSelect = document.getElementById('originSelect');
+                var option = originSelect.querySelector('option[value="my-location"]');
+                if (option) {
+                    option.textContent = '📍 My Location (' + myLocation.lat.toFixed(4) + ', ' + myLocation.lng.toFixed(4) + ')';
+                }
+            },
+            function(error) {
+                var errorMsg = 'Unable to get location';
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        errorMsg = 'Location access denied';
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        errorMsg = 'Location unavailable';
+                        break;
+                    case error.TIMEOUT:
+                        errorMsg = 'Location request timed out';
+                        break;
+                }
+                status.textContent = errorMsg;
+                btn.innerHTML = '<span>📍</span> Get My Location';
+                btn.disabled = false;
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+        );
+    }
+    
+    // Toggle live tracking
+    function toggleLiveTracking() {
+        var btn = document.getElementById('liveTrackBtn');
+        var infoPanel = document.getElementById('liveTrackerInfo');
+        
+        if (liveTrackingActive) {
+            // Stop live tracking
+            liveTrackingActive = false;
+            btn.innerHTML = '<span>🔴</span> Start Live Tracking';
+            btn.classList.remove('active');
+            infoPanel.classList.remove('active');
+            
+            if (watchPositionId) {
+                navigator.geolocation.clearWatch(watchPositionId);
+                watchPositionId = null;
+            }
+        } else {
+            // Start live tracking
+            if (!myLocation) {
+                alert('Please get your location first using the "Get My Location" button');
+                return;
+            }
+            
+            liveTrackingActive = true;
+            distanceTraveled = 0;
+            startPosition = { ...myLocation };
+            startTime = new Date();
+            
+            btn.innerHTML = '<span>⏹️</span> Stop Live Tracking';
+            btn.classList.add('active');
+            infoPanel.classList.add('active');
+            
+            // Update stats
+            document.getElementById('currentSpeed').textContent = '0';
+            document.getElementById('distanceTraveled').textContent = '0';
+            
+            // Start watching position
+            watchPositionId = navigator.geolocation.watchPosition(
+                updateLivePosition,
+                function(error) {
+                    console.error('Watch position error:', error);
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 5000,
+                    maximumAge: 0
+                }
+            );
+        }
+    }
+    
+    // Update live position
+    function updateLivePosition(position) {
+        if (!liveTrackingActive) return;
+        
+        var newPos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+        };
+        
+        var speed = position.coords.speed;
+        if (speed < 0) speed = 0; // Sometimes GPS returns -1 for unavailable
+        
+        var speedKmh = (speed * 3.6).toFixed(1);
+        
+        // Calculate distance from start
+        if (startPosition) {
+            distanceTraveled += calculateDistance(startPosition, newPos);
+            startPosition = newPos;
+        }
+        
+        // Update UI
+        document.getElementById('currentSpeed').textContent = speedKmh;
+        document.getElementById('distanceTraveled').textContent = distanceTraveled.toFixed(2);
+        document.getElementById('liveSpeed').textContent = speedKmh;
+        document.getElementById('liveDistance').textContent = distanceTraveled.toFixed(2);
+        
+        // Update duration
+        var elapsed = Math.floor((new Date() - startTime) / 1000);
+        var minutes = Math.floor(elapsed / 60);
+        var seconds = elapsed % 60;
+        document.getElementById('liveDuration').textContent = 
+            String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+        
+        // Update progress if on route
+        if (currentRouteCoords.length > 0 && routeDistance > 0) {
+            var minDist = Infinity;
+            currentRouteCoords.forEach(function(coord) {
+                var d = calculateDistance(newPos, {lat: coord[0], lng: coord[1]});
+                if (d < minDist) minDist = d;
+            });
+            
+            // Estimate progress
+            var progress = Math.min(100, (distanceTraveled / routeDistance) * 100);
+            document.getElementById('liveProgress').textContent = progress.toFixed(0) + '%';
+            document.getElementById('routeProgressBar').style.width = progress + '%';
+        }
+        
+        // Update marker on map
+        if (liveMarker) {
+            map.removeLayer(liveMarker);
+        }
+        
+        liveMarker = L.marker([newPos.lat, newPos.lng], {
+            icon: L.divIcon({
+                className: 'live-marker',
+                html: '<div style="background: #ef4444; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px #ef4444; animation: pulse 1s infinite;"></div>',
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
+            })
+        }).addTo(map);
+        liveMarker.bindPopup('📍 Live: ' + speedKmh + ' km/h').openPopup();
+        
+        // Center map on position
+        map.setView([newPos.lat, newPos.lng], map.getZoom());
+    }
+    
+    // Calculate distance between two points (Haversine formula)
+    function calculateDistance(point1, point2) {
+        var R = 6371; // Earth's radius in km
+        var dLat = (point2.lat - point1.lat) * Math.PI / 180;
+        var dLng = (point2.lng - point1.lng) * Math.PI / 180;
+        var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(point1.lat * Math.PI / 180) * Math.cos(point2.lat * Math.PI / 180) *
+                Math.sin(dLng/2) * Math.sin(dLng/2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    }
+    
+    // Set travel mode
+    function setTravelMode(mode) {
+        travelMode = mode;
+        
+        document.querySelectorAll('.travel-mode-btn').forEach(function(btn) {
+            btn.classList.remove('active');
+        });
+        document.getElementById('mode-' + mode).classList.add('active');
+        
+        if (originId && destId) {
+            calculateRoute();
+        }
+    }
+    
+    function createIcon(color) {
+        return L.divIcon({
+            className: 'custom-marker',
+            html: '<div style="background-color: ' + color + '; width: 28px; height: 28px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"></div>',
+            iconSize: [28, 28],
+            iconAnchor: [14, 14]
+        });
+    }
+    
+    function handlePropertyClick(id, name) {
+        var prop = propertiesData.find(function(p) { return p.id === id; });
+        
+        if (!prop) return;
+        
+        clearRoute();
+        
+        if (!prop.lat || !prop.lng) {
+            selectPropertyForLocation(id, name);
+            return;
+        }
+        
+        if (originId === null) {
+            originId = id;
+            document.getElementById('originSelect').value = id;
+            document.getElementById('originName').textContent = name;
+            document.getElementById('originLabel').style.display = 'inline-block';
+            document.getElementById('myLocationLabel').style.display = 'none';
+            
+            document.querySelectorAll('.property-item').forEach(function(item) {
+                if (item.dataset.id == id) {
+                    item.classList.add('selected-origin');
+                }
+            });
+            
+            if (originMarker) map.removeLayer(originMarker);
+            originMarker = L.marker([prop.lat, prop.lng], {icon: createIcon('#667eea')}).addTo(map);
+            originMarker.bindPopup(createModernPopup('🏁 Origin: ' + prop.name, {'📍 Location': prop.lat.toFixed(4) + ', ' + prop.lng.toFixed(4)})).openPopup();
+            
+        } else if (destId === null && id !== originId) {
+            destId = id;
+            document.getElementById('destinationSelect').value = id;
+            document.getElementById('destName').textContent = name;
+            document.getElementById('destLabel').style.display = 'inline-block';
+            
+            document.querySelectorAll('.property-item').forEach(function(item) {
+                if (item.dataset.id == id) {
+                    item.classList.add('selected-destination');
+                }
+            });
+            
+            if (destMarker) map.removeLayer(destMarker);
+            destMarker = L.marker([prop.lat, prop.lng], {icon: createIcon('#ef4444')}).addTo(map);
+            destMarker.bindPopup('🏁 Destination: ' + prop.name).openPopup();
+            
+            calculateRoute();
+        } else {
+            resetSelection();
+            originId = id;
+            document.getElementById('originSelect').value = id;
+            document.getElementById('originName').textContent = name;
+            document.getElementById('originLabel').style.display = 'inline-block';
+            
+            document.querySelectorAll('.property-item').forEach(function(item) {
+                if (item.dataset.id == id) {
+                    item.classList.add('selected-origin');
+                }
+            });
+            
+            if (originMarker) map.removeLayer(originMarker);
+            originMarker = L.marker([prop.lat, prop.lng], {icon: createIcon('#667eea')}).addTo(map);
+            originMarker.bindPopup('🏁 Origin: ' + prop.name).openPopup();
+        }
+    }
+    
+    function updateOrigin() {
+        var select = document.getElementById('originSelect');
+        var value = select.value;
+        
+        clearRoute();
+        
+        if (value === 'my-location') {
+            if (!myLocation) {
+                alert('Please get your location first using the "Get My Location" button');
+                select.value = originId || '';
+                return;
+            }
+            originId = 'my-location';
+            document.getElementById('originLabel').style.display = 'none';
+            document.getElementById('myLocationLabel').style.display = 'inline-block';
+            
+            if (originMarker) map.removeLayer(originMarker);
+            originMarker = L.marker([myLocation.lat, myLocation.lng], {icon: createIcon('#10b981')}).addTo(map);
+            originMarker.bindPopup('📍 My Location').openPopup();
+            
+            if (destId) calculateRoute();
+            
+        } else if (value) {
+            var id = parseInt(value);
+            var prop = propertiesData.find(function(p) { return p.id === id; });
+            if (prop) {
+                originId = id;
+                document.getElementById('originName').textContent = prop.name;
+                document.getElementById('originLabel').style.display = 'inline-block';
+                document.getElementById('myLocationLabel').style.display = 'none';
+                
+                if (originMarker) map.removeLayer(originMarker);
+                originMarker = L.marker([prop.lat, prop.lng], {icon: createIcon('#667eea')}).addTo(map);
+                originMarker.bindPopup('🏁 Origin: ' + prop.name).openPopup();
+                
+                if (destId) calculateRoute();
+            }
+        } else {
+            originId = null;
+            document.getElementById('originLabel').style.display = 'none';
+            document.getElementById('myLocationLabel').style.display = 'none';
+            if (originMarker) {
+                map.removeLayer(originMarker);
+                originMarker = null;
+            }
+        }
+    }
+    
+    function updateDestination() {
+        var select = document.getElementById('destinationSelect');
+        var id = parseInt(select.value);
+        
+        clearRoute();
+        
+        if (id) {
+            var prop = propertiesData.find(function(p) { return p.id === id; });
+            if (prop) {
+                destId = id;
+                document.getElementById('destName').textContent = prop.name;
+                document.getElementById('destLabel').style.display = 'inline-block';
+                
+                if (destMarker) map.removeLayer(destMarker);
+                destMarker = L.marker([prop.lat, prop.lng], {icon: createIcon('#ef4444')}).addTo(map);
+                destMarker.bindPopup('🏁 Destination: ' + prop.name).openPopup();
+                
+                if (originId) calculateRoute();
+            }
+        } else {
+            destId = null;
+            document.getElementById('destLabel').style.display = 'none';
+            if (destMarker) {
+                map.removeLayer(destMarker);
+                destMarker = null;
+            }
+        }
+    }
+    
+    function clearRoute() {
+        if (routeLayer) {
+            map.removeLayer(routeLayer);
+            routeLayer = null;
+        }
+        if (alternativeRouteLayer) {
+            map.removeLayer(alternativeRouteLayer);
+            alternativeRouteLayer = null;
+        }
+        if (liveMarker) {
+            map.removeLayer(liveMarker);
+            liveMarker = null;
+        }
+        document.getElementById('routeResults').style.display = 'none';
+        document.getElementById('directionsPanel').style.display = 'none';
+        currentRoute = null;
+        currentRouteCoords = [];
+        routeDistance = 0;
+    }
+    
+    function resetSelection() {
+        originId = null;
+        destId = null;
+        
+        document.getElementById('originSelect').value = '';
+        document.getElementById('destinationSelect').value = '';
+        document.getElementById('originLabel').style.display = 'none';
+        document.getElementById('destLabel').style.display = 'none';
+        document.getElementById('myLocationLabel').style.display = 'none';
+        
+        document.querySelectorAll('.property-item').forEach(function(item) {
+            item.classList.remove('selected-origin', 'selected-destination');
+        });
+        
+        if (originMarker) {
+            map.removeLayer(originMarker);
+            originMarker = null;
+        }
+        if (destMarker) {
+            map.removeLayer(destMarker);
+            destMarker = null;
+        }
+        
+        clearRoute();
+    }
+    
+    // Calculate straight-line distance using Haversine formula
+    function getStraightLineDistance(lat1, lon1, lat2, lon2) {
+        var R = 6371; // Earth's radius in km
+        var dLat = (lat2 - lat1) * Math.PI / 180;
+        var dLon = (lon2 - lon1) * Math.PI / 180;
+        var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    }
+    
+    // Geocode an address using Nominatim
+    async function geocodeAddress(address) {
+        try {
+            var response = await fetch(
+                'https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(address) + '&limit=1',
+                { headers: { 'User-Agent': 'PropertyManagerGIS/1.0' } }
+            );
+            var data = await response.json();
+            if (data.length > 0) {
+                return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon), name: data[0].display_name };
+            }
+            return null;
+        } catch (error) {
+            console.error('Geocoding error:', error);
+            return null;
+        }
+    }
+    
+    // Calculate distance from address inputs
+    async function calculateDistanceFromAddresses() {
+        var addr1 = document.getElementById('pointAAddress').value.trim();
+        var addr2 = document.getElementById('pointBAddress').value.trim();
+        
+        if (!addr1 || !addr2) {
+            alert('Please enter both locations');
+            return;
+        }
+        
+        var btn = document.getElementById('distanceBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span>⏳</span> Calculating...';
+        
+        try {
+            // Geocode both addresses
+            var loc1 = await geocodeAddress(addr1);
+            var loc2 = await geocodeAddress(addr2);
+            
+            if (!loc1 || !loc2) {
+                alert('Could not find one or both locations. Please check the addresses.');
+                btn.disabled = false;
+                btn.innerHTML = '🛣️ Get Distance & Route';
+                return;
+            }
+            
+            // Calculate straight-line distance
+            var straightDistance = getStraightLineDistance(loc1.lat, loc1.lon, loc2.lat, loc2.lon);
+            
+            // Get route from OSRM
+            var profile = 'driving';
+            if (travelMode === 'walking') profile = 'foot';
+            else if (travelMode === 'cycling') profile = 'cycling';
+            
+            var routeUrl = 'https://router.project-osrm.org/route/v1/' + profile + '/' + 
+                          loc1.lon + ',' + loc1.lat + ';' + loc2.lon + ',' + loc2.lat + 
+                          '?overview=full&geometries=geojson&steps=true';
+            
+            var routeResponse = await fetch(routeUrl);
+            var routeData = await routeResponse.json();
+            
+            if (routeData.code !== 'Ok' || !routeData.routes || routeData.routes.length === 0) {
+                // If no route found, show only straight-line distance
+                showDistanceResult(addr1, addr2, straightDistance, null);
+                btn.disabled = false;
+                btn.innerHTML = '🛣️ Get Distance & Route';
+                return;
+            }
+            
+            var route = routeData.routes[0];
+            var roadDistance = route.distance / 1000; // km
+            var duration = Math.round(route.duration / 60); // minutes
+            
+            // Draw route on map
+            clearRoute();
+            var coords = route.geometry.coordinates.map(function(c) { return [c[1], c[0]]; });
+            
+            // Draw route line
+            var polyline = L.polyline(coords, {
+                color: '#2196F3',
+                weight: 5,
+                opacity: 0.8
+            }).addTo(map);
+            
+            // Add glow effect
+            var glowLine = L.polyline(coords, {
+                color: '#2196F3',
+                weight: 12,
+                opacity: 0.3
+            }).addTo(map);
+            
+            routeLayer = polyline;
+            
+            // Add start marker
+            var startIcon = L.divIcon({
+                className: 'route-marker',
+                html: '<div style="background: linear-gradient(135deg, #10b981, #059669); width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">S</div>',
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            });
+            L.marker([loc1.lat, loc1.lon], {icon: startIcon}).addTo(map).bindPopup(createModernPopup('🟢 Start: ' + addr1, {'Coordinates': loc1.lat.toFixed(4) + ', ' + loc1.lon.toFixed(4)}));
+            
+            // Add end marker
+            var endIcon = L.divIcon({
+                className: 'route-marker',
+                html: '<div style="background: linear-gradient(135deg, #ef4444, #dc2626); width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">E</div>',
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            });
+            L.marker([loc2.lat, loc2.lon], {icon: endIcon}).addTo(map).bindPopup(createModernPopup('🔴 End: ' + addr2, {'Coordinates': loc2.lat.toFixed(4) + ', ' + loc2.lon.toFixed(4)}));
+            
+            // Fit map to route
+            map.fitBounds(polyline.getBounds(), { padding: [50, 50] });
+            
+            // Show results
+            showDistanceResult(addr1, addr2, straightDistance, route);
+            
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error calculating distance. Please try again.');
+        }
+        
+        btn.disabled = false;
+        btn.innerHTML = '🛣️ Get Distance & Route';
+    }
+    
+    // Display distance results
+    function showDistanceResult(addr1, addr2, straightDistance, route) {
+        var html = '';
+        
+        if (route) {
+            var roadDistance = route.distance / 1000;
+            var duration = Math.round(route.duration / 60);
+            var hours = Math.floor(duration / 60);
+            var mins = duration % 60;
+            var durationStr = hours > 0 ? hours + 'h ' + mins + 'm' : mins + ' min';
+            
+            html += '<div class="route-result main-route">';
+            html += '<div style="font-weight: bold; margin-bottom: 0.5rem;">🛣️ Route Information</div>';
+            html += '<div class="route-distance">📏 ' + roadDistance.toFixed(2) + ' km</div>';
+            html += '<div class="route-distance" style="font-size: 0.9rem; color: #666;">(' + (roadDistance * 0.621371).toFixed(2) + ' miles)</div>';
+            html += '<div class="route-duration">⏱️ ' + durationStr + '</div>';
+            html += '</div>';
+            
+            html += '<div class="route-result" style="background: #e8f5e9;">';
+            html += '<div style="font-weight: bold; margin-bottom: 0.5rem;">📍 Straight-Line Distance</div>';
+            html += '<div>' + straightDistance.toFixed(2) + ' km</div>';
+            html += '<div style="font-size: 0.85rem; color: #666;">(' + (straightDistance * 0.621371).toFixed(2) + ' miles)</div>';
+            html += '</div>';
+            
+            // Turn-by-turn directions
+            if (route.legs && route.legs[0] && route.legs[0].steps) {
+                html += '<div style="margin-top: 1rem;">';
+                html += '<div style="font-weight: bold; margin-bottom: 0.5rem;">🧭 Turn-by-Turn Directions</div>';
+                html += '<div style="max-height: 200px; overflow-y: auto;">';
+                route.legs[0].steps.slice(0, 10).forEach(function(step, index) {
+                    var stepDist = step.distance >= 1000 ? (step.distance/1000).toFixed(1) + ' km' : Math.round(step.distance) + ' m';
+                    html += '<div style="padding: 8px; background: #f9f9f9; margin-bottom: 6px; border-radius: 4px; font-size: 12px;">';
+                    html += '<strong>' + (index + 1) + '.</strong> ' + (step.name || 'Continue') + ' (' + stepDist + ')';
+                    html += '</div>';
+                });
+                html += '</div></div>';
+            }
+        } else {
+            html += '<div class="route-result">';
+            html += '<div style="font-weight: bold; margin-bottom: 0.5rem;">📍 Straight-Line Distance</div>';
+            html += '<div class="route-distance">' + straightDistance.toFixed(2) + ' km</div>';
+            html += '<div style="font-size: 0.9rem; color: #666;">(' + (straightDistance * 0.621371).toFixed(2) + ' miles)</div>';
+            html += '</div>';
+        }
+        
+        document.getElementById('routeContent').innerHTML = html;
+        document.getElementById('routeResults').style.display = 'block';
+    }
+        
+    function calculateRoute() {
+        if (!originId || !destId) return;
+        
+        var origin, dest;
+        
+        if (originId === 'my-location') {
+            if (!myLocation) {
+                alert('Please get your location first');
+                return;
+            }
+            origin = myLocation;
+        } else {
+            origin = propertiesData.find(function(p) { return p.id === originId; });
+        }
+        
+        dest = propertiesData.find(function(p) { return p.id === destId; });
+        
+        if (!origin || !dest || !origin.lat || !origin.lng || !dest.lat || !dest.lng) {
+            alert('Both origin and destination must have location coordinates');
+            return;
+        }
+        
+        var btn = document.getElementById('calculateBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span>⏳</span> Calculating...';
+        
+        var profile = 'driving';
+        if (travelMode === 'walking') profile = 'foot';
+        else if (travelMode === 'cycling') profile = 'cycling';
+        
+        var url = 'https://router.project-osrm.org/route/v1/' + profile + '/' + 
+                  origin.lng + ',' + origin.lat + ';' + dest.lng + ',' + dest.lat + 
+                  '?overview=full&alternatives=true&steps=true';
+        
+        fetch(url)
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                displayRouteResults(data, origin, dest);
+                btn.disabled = false;
+                btn.innerHTML = '🛣️ Calculate Route';
+            })
+            .catch(function(error) {
+                console.error('Route calculation error:', error);
+                document.getElementById('routeContent').innerHTML = 
+                    '<div class="error-message">Error calculating route. Please try again.</div>';
+                document.getElementById('routeResults').style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = '🛣️ Calculate Route';
+            });
+    }
+    
+    function displayRouteResults(data, origin, dest) {
+        var content = document.getElementById('routeContent');
+        
+        if (data.code !== 'Ok' || !data.routes || data.routes.length === 0) {
+            content.innerHTML = '<div class="error-message">No route found between these locations.</div>';
+            document.getElementById('routeResults').style.display = 'block';
+            return;
+        }
+        
+        var routes = data.routes;
+        var html = '';
+        var directionsHtml = '';
+        
+        var modeIcons = {
+            'driving': '🚗',
+            'walking': '🚶',
+            'cycling': '🚴'
+        };
+        
+        routes.forEach(function(route, index) {
+            var distanceKm = (route.distance / 1000).toFixed(2);
+            var durationMin = Math.round(route.duration / 60);
+            var durationHrs = Math.floor(durationMin / 60);
+            var remainingMin = durationMin % 60;
+            var speedKmh = route.duration > 0 ? (route.distance / 1000 / (route.duration / 3600)).toFixed(1) : 0;
+            
+            routeDistance = route.distance / 1000;
+            
+            var routeClass = index === 0 ? 'main-route' : 'alternative';
+            var routeLabel = index === 0 ? '🏆 Fastest Route' : 'Alternative Route ' + index;
+            
+            html += '<div class="route-result ' + routeClass + '">';
+            html += '<div style="font-weight: bold; margin-bottom: 0.5rem;">' + routeLabel + ' ' + modeIcons[travelMode] + '</div>';
+            html += '<div class="route-distance">📏 ' + distanceKm + ' km</div>';
+            html += '<div class="route-duration">⏱️ ' + durationHrs + ' hr ' + remainingMin + ' min</div>';
+            html += '<div class="route-speed">⚡ Avg Speed: ' + speedKmh + ' km/h</div>';
+            html += '</div>';
+            
+            // Store route coordinates for live tracking
+            if (index === 0 && route.geometry && route.geometry.coordinates) {
+                currentRouteCoords = route.geometry.coordinates.map(function(c) { return [c[1], c[0]]; });
+            }
+            
+            // Add turn-by-turn directions
+            if (index === 0 && route.legs && route.legs[0] && route.legs[0].steps) {
+                route.legs[0].steps.forEach(function(step, stepIndex) {
+                    var maneuverIcon = '➡️';
+                    if (step.maneuver) {
+                        switch(step.maneuver.type) {
+                            case 'depart': maneuverIcon = '🚀'; break;
+                            case 'arrive': maneuverIcon = '🏁'; break;
+                            case 'turn': 
+                                var modifier = step.maneuver.modifier;
+                                if (modifier === 'left') maneuverIcon = '⬅️';
+                                else if (modifier === 'right') maneuverIcon = '➡️';
+                                else if (modifier === 'slight left') maneuverIcon = '↩️';
+                                else if (modifier === 'slight right') maneuverIcon = '↪️';
+                                else if (modifier === 'sharp left') maneuverIcon = '🔙';
+                                else if (modifier === 'sharp right') maneuverIcon = '🔚';
+                                break;
+                            case 'merge': maneuverIcon = '🔀'; break;
+                            case 'fork': 
+                                if (step.maneuver.modifier === 'left') maneuverIcon = '⬆️';
+                                else maneuverIcon = '⬆️';
+                                break;
+                            case 'end of road': maneuverIcon = '🔚'; break;
+                            case 'new name': maneuverIcon = '➡️'; break;
+                            case 'continue': maneuverIcon = '➡️'; break;
+                        }
+                    }
+                    
+                    var distance = step.distance >= 1000 ? (step.distance/1000).toFixed(1) + ' km' : Math.round(step.distance) + ' m';
+                    
+                    directionsHtml += '<div class="direction-step">';
+                    directionsHtml += '<div class="direction-icon">' + maneuverIcon + '</div>';
+                    directionsHtml += '<div>';
+                    directionsHtml += '<div class="direction-text">' + (step.name || 'Continue') + '</div>';
+                    directionsHtml += '<div class="direction-distance">' + distance + '</div>';
+                    directionsHtml += '</div>';
+                    directionsHtml += '</div>';
+                });
+            }
+            
+            // Draw route on map with smooth curves
+            if (route.geometry && route.geometry.coordinates) {
+                var coords = route.geometry.coordinates.map(function(c) { return [c[1], c[0]]; });
+                
+                // Use curved lines plugin for smooth bezier curves
+                var curvedPath = L.curve(
+                    getCurvePath(coords),
+                    {
+                        color: index === 0 ? '#667eea' : '#f59e0b',
+                        weight: index === 0 ? 5 : 3,
+                        opacity: index === 0 ? 1 : 0.6,
+                        dashArray: index === 0 ? null : '10, 10'
+                    }
+                ).addTo(map);
+                
+                // Also add a simple polyline as fallback and for better visibility
+                var polyline = L.polyline(coords, {
+                    color: index === 0 ? '#667eea' : '#f59e0b',
+                    weight: index === 0 ? 4 : 2,
+                    opacity: index === 0 ? 0.9 : 0.5,
+                    smoothFactor: 2
+                }).addTo(map);
+                
+                // Add glow effect for main route
+                if (index === 0) {
+                    var glowLine = L.polyline(coords, {
+                        color: '#667eea',
+                        weight: 10,
+                        opacity: 0.3,
+                        lineCap: 'round',
+                        lineJoin: 'round'
+                    }).addTo(map);
+                }
+                
+                // Add START marker (green) on the route
+                if (index === 0 && coords.length > 0) {
+                    var startPoint = coords[0];
+                    var startIcon = L.divIcon({
+                        className: 'route-marker',
+                        html: '<div style="background: linear-gradient(135deg, #10b981, #059669); width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">S</div>',
+                        iconSize: [30, 30],
+                        iconAnchor: [15, 15]
+                    });
+                    var startMarker = L.marker(startPoint, {icon: startIcon}).addTo(map);
+                    startMarker.bindPopup(createModernPopup('📍 START', {
+                        'Location': startPoint[0].toFixed(4) + ', ' + startPoint[1].toFixed(4)
+                    }));
+                }
+                
+                // Add END marker (red) on the route
+                if (index === 0 && coords.length > 1) {
+                    var endPoint = coords[coords.length - 1];
+                    var endIcon = L.divIcon({
+                        className: 'route-marker',
+                        html: '<div style="background: linear-gradient(135deg, #ef4444, #dc2626); width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">E</div>',
+                        iconSize: [30, 30],
+                        iconAnchor: [15, 15]
+                    });
+                    var endMarker = L.marker(endPoint, {icon: endIcon}).addTo(map);
+                    endMarker.bindPopup(createModernPopup('🏁 END', {
+                        'Location': endPoint[0].toFixed(4) + ', ' + endPoint[1].toFixed(4)
+                    }));
+                }
+                
+                // Add LIVE tracking marker (black) - hidden initially
+                if (index === 0 && coords.length > 0) {
+                    var liveIcon = L.divIcon({
+                        className: 'live-marker',
+                        html: '<div style="background: linear-gradient(135deg, #1f2937, #111827); width: 24px; height: 24px; border-radius: 50%; border: 2px solid #10b981; box-shadow: 0 0 15px rgba(16, 185, 129, 0.5); display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;">●</div>',
+                        iconSize: [24, 24],
+                        iconAnchor: [12, 12]
+                    });
+                    // Store for live tracking
+                    window.liveTrackingIcon = liveIcon;
+                    window.liveTrackingCoords = coords;
+                }
+                
+                // Fit map to route bounds
+                map.fitBounds(polyline.getBounds(), { padding: [50, 50] });
+                
+                if (index === 0) {
+                    routeLayer = polyline;
+                } else {
+                    alternativeRouteLayer = polyline;
+                }
+            }
+        });
+        
+        if (routeLayer) {
+            map.fitBounds(routeLayer.getBounds(), {padding: [50, 50]});
+        }
+        
+        content.innerHTML = html;
+        document.getElementById('routeResults').style.display = 'block';
+        
+        // Show directions
+        if (directionsHtml) {
+            document.getElementById('directionsList').innerHTML = directionsHtml;
+            document.getElementById('directionsPanel').style.display = 'block';
+        }
+    }
+    
+    function selectPropertyForLocation(id, name) {
+        currentPropertyId = id;
+        
+        document.getElementById('locationForm').style.display = 'block';
+        document.getElementById('selectedPropertyName').textContent = 'Set Location: ' + name;
+        document.getElementById('propertyIdInput').value = id;
+        document.getElementById('latInput').value = '';
+        document.getElementById('lngInput').value = '';
+        
+        var form = document.getElementById('updateLocationForm');
+        form.action = '/gis/update-location/' + id + '/';
+        
+        if (currentMarker) {
+            map.removeLayer(currentMarker);
+            currentMarker = null;
+        }
+        
+        map.setView([-1.2921, 36.8219], 6);
+    }
+    
+    // If there are properties with locations, center on first one
+    var mappedProps = propertiesData.filter(function(p) { return p.lat && p.lng; });
+    if (mappedProps.length > 0) {
+        map.setView([mappedProps[0].lat, mappedProps[0].lng], 10);
+    }
+</script>
+{% endblock %}

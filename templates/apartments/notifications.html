@@ -1,0 +1,347 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications - Property Manager{% endblock %}
+
+{% block content %}
+<div class="notifications-container">
+    <div class="page-header">
+        <div class="header-content">
+            <h1><i class="fas fa-bell"></i> Notifications</h1>
+            <span class="badge badge-primary">{{ unread_count }} unread</span>
+        </div>
+        
+        {% if notifications %}
+        <form method="post" class="mark-all-form">
+            {% csrf_token %}
+            <button type="submit" name="mark_all_read" class="btn btn-outline">
+                <i class="fas fa-check-double"></i> Mark All as Read
+            </button>
+        </form>
+        {% endif %}
+    </div>
+    
+    {% if notifications %}
+    <div class="notifications-list">
+        {% for notification in notifications %}
+        <div class="notification-item {% if not notification.is_read %}unread{% endif %}">
+            <div class="notification-icon">
+                {% if notification.notification_type == 'payment' %}
+                <i class="fas fa-money-bill-wave"></i>
+                {% elif notification.notification_type == 'lease' %}
+                <i class="fas fa-file-contract"></i>
+                {% elif notification.notification_type == 'maintenance' %}
+                <i class="fas fa-tools"></i>
+                {% elif notification.notification_type == 'expense' %}
+                <i class="fas fa-receipt"></i>
+                {% elif notification.notification_type == 'tenant' %}
+                <i class="fas fa-user"></i>
+                {% elif notification.notification_type == 'announcement' %}
+                <i class="fas fa-bullhorn"></i>
+                {% elif notification.notification_type == 'social' %}
+                <i class="fas fa-share-alt"></i>
+                {% else %}
+                <i class="fas fa-info-circle"></i>
+                {% endif %}
+            </div>
+            <div class="notification-content">
+                <h4>{{ notification.title }}</h4>
+                <p>{{ notification.message }}</p>
+                
+                {% if notification.description %}
+                <div class="notification-description">
+                    {{ notification.description|linebreaks }}
+                </div>
+                {% endif %}
+                
+                <!-- Image -->
+                {% if notification.image_url %}
+                <div class="notification-image">
+                    <img src="{{ notification.image_url }}" alt="Notification Image" onerror="this.style.display='none'">
+                </div>
+                {% endif %}
+                
+                <!-- Social Links -->
+                {% if notification.social_links %}
+                <div class="notification-social">
+                    {% if notification.social_links.facebook %}
+                    <a href="{{ notification.social_links.facebook }}" target="_blank" class="social-icon" title="Facebook" style="background: #1877f2;">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    {% endif %}
+                    {% if notification.social_links.twitter %}
+                    <a href="{{ notification.social_links.twitter }}" target="_blank" class="social-icon" title="Twitter" style="background: #1da1f2;">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    {% endif %}
+                    {% if notification.social_links.instagram %}
+                    <a href="{{ notification.social_links.instagram }}" target="_blank" class="social-icon" title="Instagram" style="background: #e4405f;">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    {% endif %}
+                    {% if notification.social_links.linkedin %}
+                    <a href="{{ notification.social_links.linkedin }}" target="_blank" class="social-icon" title="LinkedIn" style="background: #0077b5;">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    {% endif %}
+                    {% if notification.social_links.youtube %}
+                    <a href="{{ notification.social_links.youtube }}" target="_blank" class="social-icon" title="YouTube" style="background: #ff0000;">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                    {% endif %}
+                    {% if notification.social_links.tiktok %}
+                    <a href="{{ notification.social_links.tiktok }}" target="_blank" class="social-icon" title="TikTok" style="background: #000000;">
+                        <i class="fab fa-tiktok"></i>
+                    </a>
+                    {% endif %}
+                    {% if notification.social_links.whatsapp %}
+                    <a href="{{ notification.social_links.whatsapp }}" target="_blank" class="social-icon" title="WhatsApp" style="background: #25d366;">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                    {% endif %}
+                    {% if notification.social_links.telegram %}
+                    <a href="{{ notification.social_links.telegram }}" target="_blank" class="social-icon" title="Telegram" style="background: #0088cc;">
+                        <i class="fab fa-telegram-plane"></i>
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+                <span class="notification-time">
+                    <i class="far fa-clock"></i> {{ notification.created_at|timesince }} ago
+                </span>
+            </div>
+            <div class="notification-actions">
+                {% if notification.link %}
+                <a href="{% url 'notification_mark_read' notification.pk %}" class="btn btn-sm">
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-bell-slash"></i>
+        <h3>No Notifications</h3>
+        <p>You're all caught up! Check back later for updates.</p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.notifications-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header-content h1 {
+    margin: 0;
+    color: #333;
+    font-weight: 600;
+}
+
+.badge-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.notifications-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.notification-item {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    align-items: flex-start;
+}
+
+.notification-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+}
+
+.notification-item.unread {
+    border-left: 4px solid #667eea;
+    background: linear-gradient(90deg, rgba(102, 126, 234, 0.05) 0%, white 100%);
+}
+
+.notification-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.notification-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.notification-content h4 {
+    margin: 0 0 8px 0;
+    color: #333;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.notification-content p {
+    margin: 0;
+    color: #666;
+    line-height: 1.6;
+}
+
+.notification-description {
+    margin-top: 12px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    color: #555;
+    font-size: 0.95rem;
+}
+
+.notification-image {
+    margin-top: 15px;
+}
+
+.notification-image img {
+    max-width: 300px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    transition: transform 0.3s ease;
+}
+
+.notification-image img:hover {
+    transform: scale(1.02);
+}
+
+.notification-social {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.social-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-decoration: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.social-icon:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    color: white;
+}
+
+.notification-time {
+    display: inline-block;
+    margin-top: 12px;
+    color: #999;
+    font-size: 0.85rem;
+}
+
+.notification-actions {
+    flex-shrink: 0;
+}
+
+.notification-actions .btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 10px;
+    padding: 10px 15px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: #ddd;
+    margin-bottom: 20px;
+}
+
+.empty-state h3 {
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    color: #999;
+}
+
+.mark-all-form .btn {
+    background: white;
+    border: 2px solid #667eea;
+    color: #667eea;
+    border-radius: 10px;
+    padding: 8px 20px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.mark-all-form .btn:hover {
+    background: #667eea;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .notification-item {
+        flex-direction: column;
+    }
+    
+    .notification-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .notification-image img {
+        max-width: 100%;
+    }
+}
+</style>
+{% endblock %}

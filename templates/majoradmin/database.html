@@ -1,0 +1,121 @@
+{% extends 'majoradmin/base.html' %}
+
+{% block title %}Database Management - Major Admin{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'majoradmin_dashboard' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">Database</li>
+{% endblock %}
+
+{% block page_content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 style="color: #333; font-weight: 600;"><i class="fas fa-database me-2" style="color: #667eea;"></i>Database Management</h2>
+    </div>
+</div>
+
+<!-- Database Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="table-card" style="border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 1.5rem;">
+                <h5 class="mb-0" style="font-weight: 600;"><i class="fas fa-chart-bar me-2"></i>Database Statistics</h5>
+            </div>
+            <div class="card-body" style="padding: 2rem;">
+                <div class="row text-center">
+                    {% for model_name, count in model_counts.items %}
+                    <div class="col-md-2 col-6 mb-3">
+                        <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);">
+                            <div style="font-size: 2rem; font-weight: bold;">{{ count }}</div>
+                            <div style="opacity: 0.9; font-size: 0.9rem;">{{ model_name }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Clear Database Section -->
+    <div class="col-md-6 mb-4">
+        <div class="table-card" style="border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <div class="card-header" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 1.5rem;">
+                <h5 class="mb-0" style="font-weight: 600;"><i class="fas fa-exclamation-triangle me-2"></i>Clear Database</h5>
+            </div>
+            <div class="card-body" style="padding: 2rem;">
+                <div class="alert" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: none; border-radius: 10px; color: #92400e;">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <strong>Warning!</strong> Clearing the database will permanently delete records. However, all operations are logged for history.
+                </div>
+                
+                <form method="POST" action="{% url 'majoradmin_clear_database' %}">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-bold" style="color: #333;">Select Tables to Clear</label>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px;">
+                            <div class="form-check mb-2">
+                                <input type="checkbox" name="tables" value="tasks" class="form-check-input" id="tasks" style="width: 20px; height: 20px;">
+                                <label class="form-check-label fw-bold" for="tasks" style="font-size: 1rem; margin-left: 10px;">Tasks</label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input type="checkbox" name="tables" value="site_content" class="form-check-input" id="site_content" style="width: 20px; height: 20px;">
+                                <label class="form-check-label fw-bold" for="site_content" style="font-size: 1rem; margin-left: 10px;">Site Content</label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input type="checkbox" name="tables" value="counties" class="form-check-input" id="counties" style="width: 20px; height: 20px;">
+                                <label class="form-check-label fw-bold" for="counties" style="font-size: 1rem; margin-left: 10px;">Counties</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" name="tables" value="user_sessions" class="form-checkuser_sessions" style="width:-input" id=" 20px; height: 20px;">
+                                <label class="form-check-label fw-bold" for="user_sessions" style="font-size: 1rem; margin-left: 10px;">User Sessions</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-bold" style="color: #333;">Reason (optional)</label>
+                        <textarea name="reason" class="form-control" rows="3" placeholder="Reason for clearing..." style="border-radius: 10px; padding: 12px;"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn w-100" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border-radius: 10px; padding: 12px; font-weight: 600;" onclick="return confirm('Are you sure? This action will be logged.');">
+                        <i class="fas fa-trash me-2"></i> Clear Selected Tables
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Database Info -->
+    <div class="col-md-6 mb-4">
+        <div class="table-card" style="border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <div class="card-header" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 1.5rem;">
+                <h5 class="mb-0" style="font-weight: 600;"><i class="fas fa-info-circle me-2"></i>Database Information</h5>
+            </div>
+            <div class="card-body" style="padding: 2rem;">
+                <div class="mb-3">
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee;">
+                        <span style="color: #666;"><i class="fas fa-database me-2" style="color: #667eea;"></i>Database Engine</span>
+                        <strong>SQLite</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee;">
+                        <span style="color: #666;"><i class="fas fa-cube me-2" style="color: #667eea;"></i>Total Records</span>
+                        <strong>{% for model_name, count in model_counts.items %}{{ count }}{% if not forloop.last %} + {% endif %}{% endfor %} = {{ total_records }}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee;">
+                        <span style="color: #666;"><i class="fas fa-server me-2" style="color: #667eea;"></i>Database Size</span>
+                        <strong>~{{ db_size }} MB</strong>
+                    </div>
+                </div>
+                
+                <div class="alert" style="background: #d1fae5; border: none; border-radius: 10px; color: #065f46;">
+                    <i class="fas fa-shield-alt me-2"></i>
+                    All database operations are logged and can be tracked in Admin Logs.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

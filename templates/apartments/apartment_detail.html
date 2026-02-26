@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ apartment }} - Property Manager{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">{{ apartment }}</h2>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <div>
+            <p><strong>Property:</strong> {{ apartment.property.name }}</p>
+            <p><strong>Unit Number:</strong> {{ apartment.unit_number }}</p>
+            <p><strong>Floor:</strong> {{ apartment.floor }}</p>
+            <p><strong>Type:</strong> {{ apartment.get_apartment_type_display }}</p>
+            <p><strong>Bedrooms:</strong> {{ apartment.bedrooms }}</p>
+            <p><strong>Bathrooms:</strong> {{ apartment.bathrooms }}</p>
+        </div>
+        <div>
+            <p><strong>Area:</strong> {{ apartment.area_sqft }} sq ft</p>
+            <p><strong>Monthly Rent:</strong> KSh {{ apartment.rent_amount|floatformat:2 }}</p>
+            <p><strong>Deposit:</strong> KSh {{ apartment.deposit_amount|floatformat:2 }}</p>
+            <p><strong>Status:</strong> 
+                <span class="badge {% if apartment.status == 'available' %}badge-success{% elif apartment.status == 'occupied' %}badge-info{% else %}badge-warning{% endif %}">
+                    {{ apartment.get_status_display }}
+                </span>
+            </p>
+            {% if apartment.description %}
+            <p><strong>Description:</strong> {{ apartment.description }}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

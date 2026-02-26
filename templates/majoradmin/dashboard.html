@@ -1,0 +1,263 @@
+{% extends 'majoradmin/base.html' %}
+
+{% block title %}Dashboard - Major Admin{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Dashboard</li>
+{% endblock %}
+
+{% block page_content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2 class="mb-4" style="color: #333; font-weight: 600;">📊 Dashboard Overview</h2>
+            <a href="{% url 'majoradmin_create_notification' %}" class="btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; padding: 10px 20px; font-weight: 600;">
+                <i class="fas fa-bullhorn me-2"></i>Create Notification
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <div style="font-size: 2rem; font-weight: bold;">{{ total_users }}</div>
+                    <div style="opacity: 0.9;">Total Users</div>
+                </div>
+                <div style="font-size: 2.5rem; opacity: 0.5;">👥</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stat-card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <div style="font-size: 2rem; font-weight: bold;">{{ active_sessions }}</div>
+                    <div style="opacity: 0.9;">Active Sessions</div>
+                </div>
+                <div style="font-size: 2.5rem; opacity: 0.5;">🟢</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stat-card" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <div style="font-size: 2rem; font-weight: bold;">{{ pending_tasks }}</div>
+                    <div style="opacity: 0.9;">Pending Tasks</div>
+                </div>
+                <div style="font-size: 2.5rem; opacity: 0.5;">📋</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stat-card" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <div style="font-size: 2rem; font-weight: bold;">{{ total_logs }}</div>
+                    <div style="opacity: 0.9;">Total Logs</div>
+                </div>
+                <div style="font-size: 2.5rem; opacity: 0.5;">📜</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Login Chart -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="table-card" style="border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 1.5rem;">
+                <h5 class="mb-0" style="font-weight: 600;">📈 User Logins (Last 30 Days)</h5>
+            </div>
+            <div class="card-body" style="padding: 1.5rem;">
+                <canvas id="loginChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="table-card" style="border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <div class="card-header" style="background: #f8f9fa; padding: 1rem 1.5rem; border-bottom: 1px solid #eee;">
+                <h5 class="mb-0" style="font-weight: 600; color: #333;">📝 Recent Admin Logs</h5>
+            </div>
+            <div class="card-body" style="padding: 0;">
+                <table class="table table-hover" style="margin: 0;">
+                    <thead style="background: #f8f9fa;">
+                        <tr>
+                            <th style="padding: 12px 15px;">Action</th>
+                            <th style="padding: 12px 15px;">User</th>
+                            <th style="padding: 12px 15px;">Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in recent_logs %}
+                        <tr>
+                            <td style="padding: 12px 15px;">
+                                <span class="badge" style="background: #667eea; color: white; padding: 4px 10px; border-radius: 20px;">{{ log.action }}</span>
+                            </td>
+                            <td style="padding: 12px 15px;">{{ log.user.username|default:"System" }}</td>
+                            <td style="padding: 12px 15px; color: #666;">{{ log.timestamp|timesince }} ago</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted" style="padding: 20px;">No logs yet</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="table-card" style="border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <div class="card-header" style="background: #f8f9fa; padding: 1rem 1.5rem; border-bottom: 1px solid #eee;">
+                <h5 class="mb-0" style="font-weight: 600; color: #333;">🔐 Recent User Sessions</h5>
+            </div>
+            <div class="card-body" style="padding: 0;">
+                <table class="table table-hover" style="margin: 0;">
+                    <thead style="background: #f8f9fa;">
+                        <tr>
+                            <th style="padding: 12px 15px;">User</th>
+                            <th style="padding: 12px 15px;">Login Time</th>
+                            <th style="padding: 12px 15px;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for session in recent_sessions %}
+                        <tr>
+                            <td style="padding: 12px 15px;">{{ session.user.username }}</td>
+                            <td style="padding: 12px 15px; color: #666;">{{ session.login_time|timesince }} ago</td>
+                            <td style="padding: 12px 15px;">
+                                {% if session.is_active %}
+                                <span class="badge" style="background: #10b981; color: white; padding: 4px 10px; border-radius: 20px;">Active</span>
+                                {% else %}
+                                <span class="badge" style="background: #6c757d; color: white; padding: 4px 10px; border-radius: 20px;">Logged Out</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted" style="padding: 20px;">No sessions yet</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Task Statistics -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="table-card" style="border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 1.5rem;">
+                <h5 class="mb-0" style="font-weight: 600;">📊 Task Statistics</h5>
+            </div>
+            <div class="card-body" style="padding: 1.5rem;">
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <div style="background: #fff3cd; padding: 1.5rem; border-radius: 12px; margin-bottom: 10px;">
+                            <h3 style="color: #856404; margin: 0;">{{ pending_tasks }}</h3>
+                        </div>
+                        <p style="color: #666; margin: 0;">Pending</p>
+                    </div>
+                    <div class="col-md-3">
+                        <div style="background: #cce5ff; padding: 1.5rem; border-radius: 12px; margin-bottom: 10px;">
+                            <h3 style="color: #004085; margin: 0;">{{ in_progress_tasks }}</h3>
+                        </div>
+                        <p style="color: #666; margin: 0;">In Progress</p>
+                    </div>
+                    <div class="col-md-3">
+                        <div style="background: #d4edda; padding: 1.5rem; border-radius: 12px; margin-bottom: 10px;">
+                            <h3 style="color: #155724; margin: 0;">{{ completed_tasks }}</h3>
+                        </div>
+                        <p style="color: #666; margin: 0;">Completed</p>
+                    </div>
+                    <div class="col-md-3">
+                        <div style="background: #e0cffc; padding: 1.5rem; border-radius: 12px; margin-bottom: 10px;">
+                            <h3 style="color: #6f42c1; margin: 0;">{{ verified_tasks }}</h3>
+                        </div>
+                        <p style="color: #666; margin: 0;">Verified</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const loginData = {{ login_data_json|safe }};
+    
+    const labels = loginData.map(d => d.label);
+    const data = loginData.map(d => d.count);
+    
+    const ctx = document.getElementById('loginChart').getContext('2d');
+    
+    // Create gradient
+    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, 'rgba(102, 126, 234, 0.5)');
+    gradient.addColorStop(1, 'rgba(102, 126, 234, 0.0)');
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Logins',
+                data: data,
+                borderColor: '#667eea',
+                backgroundColor: gradient,
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#667eea',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
+

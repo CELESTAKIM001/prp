@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ property.name }} - Property Manager{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">{{ property.name }}</h2>
+        <a href="{% url 'property_update' property.pk %}" class="btn btn-primary">Edit</a>
+    </div>
+    
+    <div style="margin-bottom: 2rem;">
+        <p><strong>Address:</strong> {{ property.address }}</p>
+        <p><strong>Total Units:</strong> {{ property.total_units }}</p>
+        <p><strong>Available Units:</strong> {{ property.available_units }}</p>
+        {% if property.description %}
+        <p><strong>Description:</strong> {{ property.description }}</p>
+        {% endif %}
+    </div>
+    
+    <h3 style="margin-bottom: 1rem;">Apartments</h3>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Unit</th>
+                    <th>Type</th>
+                    <th>Bedrooms</th>
+                    <th>Rent</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for apartment in apartments %}
+                <tr>
+                    <td>{{ apartment.unit_number }}</td>
+                    <td>{{ apartment.get_apartment_type_display }}</td>
+                    <td>{{ apartment.bedrooms }}</td>
+                    <td>KSh {{ apartment.rent_amount|floatformat:2 }}</td>
+                    <td>
+                        <span class="badge {% if apartment.status == 'available' %}badge-success{% elif apartment.status == 'occupied' %}badge-info{% else %}badge-warning{% endif %}">
+                            {{ apartment.get_status_display }}
+                        </span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; color: #666;">No apartments in this property</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

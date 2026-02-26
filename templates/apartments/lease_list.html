@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Leases - Property Manager{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Leases</h2>
+        <a href="{% url 'lease_create' %}" class="btn btn-primary">Add Lease</a>
+    </div>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Apartment</th>
+                    <th>Tenant</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Rent</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lease in leases %}
+                <tr>
+                    <td>{{ lease.apartment }}</td>
+                    <td>{{ lease.tenant.full_name }}</td>
+                    <td>{{ lease.start_date }}</td>
+                    <td>{{ lease.end_date }}</td>
+                    <td>KSh {{ lease.rent_amount|floatformat:2 }}</td>
+                    <td>
+                        <span class="badge {% if lease.status == 'active' %}badge-success{% elif lease.status == 'pending' %}badge-warning{% elif lease.status == 'expired' %}badge-danger{% else %}badge-info{% endif %}">
+                            {{ lease.get_status_display }}
+                        </span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; color: #666;">No leases found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

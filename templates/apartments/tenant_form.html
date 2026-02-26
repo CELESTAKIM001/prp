@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if object %}Edit{% else %}Add{% endif %} Tenant - Property Manager{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">{% if object %}Edit{% else %}Add{% endif %} Tenant</h2>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label class="form-label">First Name *</label>
+                        {{ form.first_name }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Last Name *</label>
+                        {{ form.last_name }}
+                    </div>
+                </div>
+                
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        {{ form.email }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone *</label>
+                        {{ form.phone }}
+                    </div>
+                </div>
+                
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Alternative Phone</label>
+                        {{ form.alternative_phone }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Gender *</label>
+                        {{ form.gender }}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">ID Number *</label>
+                    {{ form.id_number }}
+                </div>
+                
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Occupation</label>
+                        {{ form.occupation }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Employer</label>
+                        {{ form.employer }}
+                    </div>
+                </div>
+                
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Emergency Contact Name</label>
+                        {{ form.emergency_contact_name }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Emergency Contact Phone</label>
+                        {{ form.emergency_contact_phone }}
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save Tenant</button>
+                    <a href="{% url 'tenant_list' %}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

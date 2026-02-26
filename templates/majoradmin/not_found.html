@@ -1,0 +1,35 @@
+{% extends 'majoradmin/base.html' %}
+
+{% block title %}Not Found - Major Admin{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'majoradmin_dashboard' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">Not Found</li>
+{% endblock %}
+
+{% block page_content %}
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="table-card" style="border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <div class="card-body text-center" style="padding: 4rem 2rem;">
+                <div style="font-size: 5rem; color: #ef4444; margin-bottom: 20px;">
+                    <i class="fas fa-user-times"></i>
+                </div>
+                <h2 style="color: #333; font-weight: 600; margin-bottom: 15px;">User Not Found</h2>
+                <p style="color: #666; font-size: 1.1rem; margin-bottom: 30px;">
+                    The user you're looking for doesn't exist or has been deleted.<br>
+                    Please check the URL and try again.
+                </p>
+                <div style="display: flex; gap: 15px; justify-content: center;">
+                    <a href="{% url 'majoradmin_users' %}" class="btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; padding: 12px 25px; font-weight: 600;">
+                        <i class="fas fa-users me-2"></i>Back to Users
+                    </a>
+                    <a href="{% url 'majoradmin_dashboard' %}" class="btn" style="background: #f8f9fa; color: #666; border-radius: 10px; padding: 12px 25px; font-weight: 500;">
+                        <i class="fas fa-home me-2"></i>Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

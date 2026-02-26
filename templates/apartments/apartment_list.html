@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Apartments - Property Manager{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Apartments</h2>
+        <a href="{% url 'apartment_create' %}" class="btn btn-primary">Add Apartment</a>
+    </div>
+    
+    <div class="filters">
+        <div class="filter-group">
+            <label>Status:</label>
+            <select onchange="location = this.value;">
+                <option value="{% url 'apartment_list' %}">All</option>
+                <option value="?status=available" {% if request.GET.status == 'available' %}selected{% endif %}>Available</option>
+                <option value="?status=occupied" {% if request.GET.status == 'occupied' %}selected{% endif %}>Occupied</option>
+                <option value="?status=maintenance" {% if request.GET.status == 'maintenance' %}selected{% endif %}>Maintenance</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Property</th>
+                    <th>Unit</th>
+                    <th>Type</th>
+                    <th>Bedrooms</th>
+                    <th>Rent</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for apartment in apartments %}
+                <tr>
+                    <td>{{ apartment.property.name }}</td>
+                    <td>{{ apartment.unit_number }}</td>
+                    <td>{{ apartment.get_apartment_type_display }}</td>
+                    <td>{{ apartment.bedrooms }}</td>
+                    <td>KSh {{ apartment.rent_amount|floatformat:2 }}</td>
+                    <td>
+                        <span class="badge {% if apartment.status == 'available' %}badge-success{% elif apartment.status == 'occupied' %}badge-info{% else %}badge-warning{% endif %}">
+                            {{ apartment.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'apartment_detail' apartment.pk %}" class="btn btn-sm btn-primary">View</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" style="text-align: center; color: #666;">No apartments found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if object %}Edit{% else %}Add{% endif %} Apartment - Property Manager{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">{% if object %}Edit{% else %}Add{% endif %} Apartment</h2>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label class="form-label">Property *</label>
+                    {{ form.property }}
+                </div>
+                
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Unit Number *</label>
+                        {{ form.unit_number }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Floor *</label>
+                        {{ form.floor }}
+                    </div>
+                </div>
+                
+                <div class="form-grid-3">
+                    <div class="form-group">
+                        <label class="form-label">Apartment Type *</label>
+                        {{ form.apartment_type }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Bedrooms *</label>
+                        {{ form.bedrooms }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Bathrooms *</label>
+                        {{ form.bathrooms }}
+                    </div>
+                </div>
+                
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Area (sq ft)</label>
+                        {{ form.area_sqft }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Monthly Rent (KSh) *</label>
+                        {{ form.rent_amount }}
+                    </div>
+                </div>
+                
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Deposit (KSh)</label>
+                        {{ form.deposit_amount }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Status *</label>
+                        {{ form.status }}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    {{ form.description }}
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save Apartment</button>
+                    <a href="{% url 'apartment_list' %}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

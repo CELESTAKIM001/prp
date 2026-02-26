@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Maintenance Requests - Property Manager{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Maintenance Requests</h2>
+        <a href="{% url 'maintenance_create' %}" class="btn btn-primary">New Request</a>
+    </div>
+    
+    <div class="filters">
+        <div class="filter-group">
+            <label>Status:</label>
+            <select onchange="location = this.value;">
+                <option value="{% url 'maintenance_list' %}">All</option>
+                <option value="?status=pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+                <option value="?status=in_progress" {% if request.GET.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                <option value="?status=completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Completed</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Apartment</th>
+                    <th>Title</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in maintenance_requests %}
+                <tr>
+                    <td>{{ request.apartment }}</td>
+                    <td>{{ request.title }}</td>
+                    <td>
+                        <span class="badge {% if request.priority == 'emergency' %}badge-danger{% elif request.priority == 'high' %}badge-warning{% else %}badge-info{% endif %}">
+                            {{ request.get_priority_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge {% if request.status == 'completed' %}badge-success{% elif request.status == 'in_progress' %}badge-warning{% else %}badge-danger{% endif %}">
+                            {{ request.get_status_display }}
+                        </span>
+                    </td>
+                    <td>{{ request.created_at|date:"M d, Y" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; color: #666;">No maintenance requests</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
