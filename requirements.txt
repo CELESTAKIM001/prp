@@ -1,0 +1,78 @@
+# Django Apartment Management System - Requirements
+# ====================================================
+# Property Manager - KIMATHI JORAM
+# Complete Dependencies
+
+# Django Web Framework
+Django>=4.2,<5.3
+
+# Django Admin Theme - Jazzmin
+django-jazzmin>=2.6.0
+
+# Image Processing (for profile pictures, property images)
+Pillow>=10.0.0
+
+# Database
+# SQLite3 is built into Python, no installation needed
+
+# Authentication & Authorization
+# (Django's built-in auth system)
+
+# Date/Time utilities
+# (Python's built-in datetime)
+
+# HTTP requests
+requests>=2.31.0
+
+# Email support (for notifications)
+# (Django's built-in email backend)
+
+# Form validation and processing
+# (Django's built-in forms)
+
+# Template engine
+# (Django's built-in template engine)
+
+# Production Deployment:
+# ---------------------
+# Gunicorn as WSGI server
+gunicorn>=21.0.0
+
+# WhiteNoise for static files in production
+whitenoise>=6.5.0
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# For PostgreSQL database (optional - switch from SQLite for production)
+# psycopg2-binary>=2.9.0
+
+# For cache backend (optional - for better performance)
+# redis>=4.5.0
+# django-redis>=5.4.0
+
+# For production server:
+# ---------------------
+# For monitoring and error tracking (optional)
+# sentry-sdk>=1.32.0
+
+# For PDF generation (optional)
+# reportlab>=4.0.0
+
+# For Excel export (optional)
+# openpyxl>=3.1.0
+
+# Development Tools:
+# -----------------
+# For code formatting
+black>=23.0.0
+
+# For linting
+flake8>=6.0.0
+
+# For auto-reloading during development
+django-browser-reload>=0.10.0
+
+# For testing
+pytest>=7.4.0
+pytest-django>=4.5.0
