@@ -1,0 +1,10 @@
+"""
+Apartments app configuration
+"""
+from django.apps import AppConfig
+
+
+class ApartmentsConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'apartments'
+    verbose_name = 'Property Management'
